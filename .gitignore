@@ -1,0 +1,11 @@
+# Secret Keys (NEVER UPLOAD THESE)
+.env
+
+# Python junk
+__pycache__/
+.venv/
+.pytest_cache/
+
+# Local Data
+*.json
+*.png
