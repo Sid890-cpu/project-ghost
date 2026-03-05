@@ -122,4 +122,8 @@ async def distill_web(url: str):
     return payload
 
 if __name__ == "__main__":
-    mcp.run(transport="http", port=8000)
+    import os
+    # Railway provides the PORT environment variable
+    port = int(os.environ.get("PORT", 8080))
+    # Tell FastMCP to run on all network interfaces (0.0.0.0)
+    mcp.run(transport="http", host="0.0.0.0", port=port)
