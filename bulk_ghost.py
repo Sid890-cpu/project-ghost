@@ -27,7 +27,7 @@ async def distill_task(client, url):
 
 async def main():
     # Increase timeout to 120 seconds for Level 2 AI analysis
-    async with Client("http://localhost:8000/mcp", timeout=120) as client:
+    async with Client("http://localhost:8080/mcp", timeout=120) as client:
         print("🚀 Starting Bulk Distillation Factory (High-Intelligence Mode)...\n")
         tasks = [distill_task(client, url) for url in target_urls]
         # ... rest of your code ...
