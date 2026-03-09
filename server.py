@@ -11,7 +11,7 @@ from pydantic import BaseModel, Field
 from starlette.applications import Starlette
 from starlette.requests import Request
 from starlette.responses import JSONResponse, HTMLResponse
-from starlette.routing import Route
+from starlette.routing import Route, Mount
 from starlette.middleware.base import BaseHTTPMiddleware
 import uvicorn
 
@@ -690,30 +690,31 @@ async def route_docs(request: Request) -> HTMLResponse:
 #  APP ASSEMBLY — MCP + REST on the same server
 # ═══════════════════════════════════════════════════════════════════════════════
 
-# Build the Starlette REST app
-rest_app = Starlette(routes=[
-    Route("/",        route_docs),
-    Route("/health",  route_health),
-    Route("/distill", route_distill, methods=["POST"]),
-    Route("/feed",    route_feed,    methods=["GET"]),
-    Route("/search",  route_search,  methods=["GET"]),
-])
-rest_app.add_middleware(TimingMiddleware)
+from starlette.routing import Mount
 
-# Mount MCP under /mcp, REST handles everything else
-mcp_app  = mcp.http_app(path="/mcp")
+# path="/" because we mount the app at /mcp below — paths don't double up
+mcp_asgi = mcp.http_app(path="/")
 
-async def combined_app(scope, receive, send):
-    """Route /mcp/* to FastMCP, everything else to Starlette REST."""
-    if scope.get("path", "").startswith("/mcp"):
-        await mcp_app(scope, receive, send)
-    else:
-        await rest_app(scope, receive, send)
+# Starlette gets MCP's lifespan so its session manager initializes correctly
+app = Starlette(
+    lifespan=mcp_asgi.lifespan,
+    routes=[
+        # REST routes
+        Route("/",        route_docs),
+        Route("/health",  route_health),
+        Route("/distill", route_distill, methods=["POST"]),
+        Route("/feed",    route_feed,    methods=["GET"]),
+        Route("/search",  route_search,  methods=["GET"]),
+        # MCP mount — tools available at /mcp
+        Mount("/mcp", app=mcp_asgi),
+    ]
+)
+app.add_middleware(TimingMiddleware)
 
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8080))
     print(f"👻 Project Ghost running on port {port}")
     print(f"   REST API : http://0.0.0.0:{port}/")
-    print(f"   MCP feed : http://0.0.0.0:{port}/mcp")
-    uvicorn.run(combined_app, host="0.0.0.0", port=port)
+    print(f"   MCP      : http://0.0.0.0:{port}/mcp")
+    uvicorn.run(app, host="0.0.0.0", port=port)
