@@ -1,0 +1,1210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Project Ghost — Web Intelligence for AI Agents</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --black:   #050505;
+      --surface: #0a0a0a;
+      --card:    #0f0f0f;
+      --border:  #1a1a1a;
+      --border2: #242424;
+      --green:   #00ff88;
+      --green2:  #00cc6a;
+      --blue:    #00aaff;
+      --amber:   #ffaa00;
+      --red:     #ff4455;
+      --text:    #e8e8e8;
+      --muted:   #555;
+      --muted2:  #333;
+    }
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--black);
+      color: var(--text);
+      font-family: 'JetBrains Mono', monospace;
+      overflow-x: hidden;
+      cursor: none;
+    }
+
+    /* Custom cursor */
+    .cursor {
+      width: 8px; height: 8px;
+      background: var(--green);
+      border-radius: 50%;
+      position: fixed;
+      pointer-events: none;
+      z-index: 9999;
+      transition: transform 0.15s ease;
+      mix-blend-mode: screen;
+    }
+    .cursor-ring {
+      width: 32px; height: 32px;
+      border: 1px solid rgba(0,255,136,0.3);
+      border-radius: 50%;
+      position: fixed;
+      pointer-events: none;
+      z-index: 9998;
+      transition: all 0.12s ease;
+    }
+
+    /* Noise overlay */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 1;
+      opacity: 0.4;
+    }
+
+    /* Scanline effect */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0,0,0,0.03) 2px,
+        rgba(0,0,0,0.03) 4px
+      );
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      padding: 20px 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid transparent;
+      transition: all 0.3s;
+      background: transparent;
+    }
+    nav.scrolled {
+      background: rgba(5,5,5,0.95);
+      border-color: var(--border);
+      backdrop-filter: blur(20px);
+    }
+    .nav-logo {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 18px;
+      color: var(--green);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      text-decoration: none;
+    }
+    .nav-logo span { color: var(--muted); }
+    .nav-links { display: flex; gap: 32px; align-items: center; }
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--text); }
+    .nav-cta {
+      background: transparent !important;
+      border: 1px solid var(--green) !important;
+      color: var(--green) !important;
+      padding: 8px 20px;
+      border-radius: 2px;
+      font-size: 11px !important;
+      letter-spacing: 2px;
+      transition: all 0.2s !important;
+    }
+    .nav-cta:hover {
+      background: var(--green) !important;
+      color: var(--black) !important;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 120px 48px 80px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Grid background */
+    .hero-grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(0,255,136,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,255,136,0.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+      mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black, transparent);
+    }
+
+    /* Glow orb */
+    .hero-glow {
+      position: absolute;
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(0,255,136,0.06) 0%, transparent 70%);
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+
+    .hero-content { position: relative; z-index: 10; max-width: 900px; }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(0,255,136,0.05);
+      border: 1px solid rgba(0,255,136,0.2);
+      padding: 6px 14px;
+      border-radius: 2px;
+      font-size: 10px;
+      letter-spacing: 3px;
+      color: var(--green);
+      text-transform: uppercase;
+      margin-bottom: 40px;
+      opacity: 0;
+      animation: fadeUp 0.6s ease 0.2s forwards;
+    }
+    .hero-badge .dot {
+      width: 6px; height: 6px;
+      background: var(--green);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+
+    .hero-title {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: clamp(52px, 7vw, 96px);
+      line-height: 0.95;
+      letter-spacing: -3px;
+      margin-bottom: 32px;
+      opacity: 0;
+      animation: fadeUp 0.6s ease 0.4s forwards;
+    }
+    .hero-title .line1 { display: block; color: var(--text); }
+    .hero-title .line2 { display: block; color: var(--green); }
+    .hero-title .line3 { display: block; color: var(--muted); font-weight: 400; font-size: 0.5em; letter-spacing: 0; font-family: 'JetBrains Mono', monospace; margin-top: 16px; }
+
+    .hero-sub {
+      font-size: 14px;
+      line-height: 1.8;
+      color: var(--muted);
+      max-width: 560px;
+      margin-bottom: 48px;
+      opacity: 0;
+      animation: fadeUp 0.6s ease 0.6s forwards;
+    }
+    .hero-sub strong { color: var(--text); font-weight: 400; }
+
+    .hero-actions {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      opacity: 0;
+      animation: fadeUp 0.6s ease 0.8s forwards;
+    }
+    .btn-primary {
+      background: var(--green);
+      color: var(--black);
+      border: none;
+      padding: 14px 32px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      text-decoration: none;
+      cursor: none;
+      border-radius: 2px;
+      transition: all 0.2s;
+    }
+    .btn-primary:hover { background: var(--green2); transform: translateY(-1px); }
+    .btn-secondary {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      border-bottom: 1px solid var(--muted2);
+      padding-bottom: 2px;
+      transition: all 0.2s;
+    }
+    .btn-secondary:hover { color: var(--text); border-color: var(--text); }
+
+    /* ── TICKER ── */
+    .ticker {
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 0;
+      overflow: hidden;
+      position: relative;
+      background: var(--surface);
+    }
+    .ticker-track {
+      display: flex;
+      gap: 0;
+      animation: ticker 30s linear infinite;
+      white-space: nowrap;
+    }
+    .ticker-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0 32px;
+      font-size: 10px;
+      letter-spacing: 2px;
+      color: var(--muted);
+      text-transform: uppercase;
+      border-right: 1px solid var(--border);
+    }
+    .ticker-item .tag {
+      color: var(--green);
+      font-size: 9px;
+    }
+    .ticker-item .score { color: var(--amber); }
+
+    /* ── LIVE DEMO ── */
+    .demo-section {
+      padding: 120px 48px;
+      position: relative;
+    }
+    .section-label {
+      font-size: 10px;
+      letter-spacing: 4px;
+      color: var(--green);
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+    .section-title {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: clamp(32px, 4vw, 52px);
+      letter-spacing: -2px;
+      margin-bottom: 16px;
+      line-height: 1.1;
+    }
+    .section-sub {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.8;
+      max-width: 480px;
+      margin-bottom: 56px;
+    }
+
+    .demo-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .demo-panel {
+      background: var(--card);
+      padding: 0;
+    }
+    .panel-header {
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--surface);
+    }
+    .panel-title {
+      font-size: 10px;
+      letter-spacing: 2px;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+    .panel-dots { display: flex; gap: 6px; }
+    .panel-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+    /* Input panel */
+    .input-panel { padding: 24px 20px; }
+    .code-line {
+      font-size: 12px;
+      line-height: 2;
+      color: var(--muted);
+    }
+    .code-line .k { color: var(--blue); }
+    .code-line .s { color: var(--green); }
+    .code-line .v { color: var(--amber); }
+    .code-line .c { color: var(--muted2); }
+
+    /* Output panel */
+    .output-panel { padding: 20px; }
+    .signal-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 16px;
+      margin-bottom: 12px;
+      position: relative;
+      overflow: hidden;
+    }
+    .signal-card::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 2px;
+      background: var(--green);
+    }
+    .signal-card.amber::before { background: var(--amber); }
+    .signal-card.blue::before  { background: var(--blue); }
+
+    .signal-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .signal-category {
+      font-size: 9px;
+      letter-spacing: 2px;
+      color: var(--green);
+      text-transform: uppercase;
+    }
+    .signal-card.amber .signal-category { color: var(--amber); }
+    .signal-card.blue  .signal-category { color: var(--blue); }
+    .signal-score {
+      font-size: 10px;
+      color: var(--muted);
+    }
+    .signal-score span { color: var(--text); }
+    .signal-title {
+      font-size: 12px;
+      color: var(--text);
+      line-height: 1.5;
+      margin-bottom: 8px;
+    }
+    .signal-entities {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .entity-tag {
+      font-size: 9px;
+      padding: 2px 8px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border2);
+      border-radius: 2px;
+      color: var(--muted);
+      letter-spacing: 1px;
+    }
+
+    /* ── TRUSTED BY ── */
+    .trusted-section {
+      padding: 56px 48px;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+    }
+    .trusted-label {
+      font-size: 10px;
+      letter-spacing: 4px;
+      color: var(--muted2);
+      text-transform: uppercase;
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    .trusted-track {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      flex-wrap: wrap;
+    }
+    .trusted-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 48px;
+      opacity: 0.4;
+      transition: opacity 0.3s;
+    }
+    .trusted-logo:hover { opacity: 1; }
+    .tl-icon {
+      font-size: 18px;
+      color: var(--green);
+      line-height: 1;
+    }
+    .tl-name {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 16px;
+      letter-spacing: 1px;
+      color: var(--text);
+      white-space: nowrap;
+    }
+    .trusted-div {
+      width: 1px;
+      height: 32px;
+      background: var(--border2);
+    }
+
+    /* ── HOW IT WORKS ── */
+    .how-section {
+      padding: 120px 48px;
+      border-top: 1px solid var(--border);
+    }
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 2px;
+      margin-top: 64px;
+      background: var(--border);
+    }
+    .step {
+      background: var(--card);
+      padding: 40px 32px;
+      position: relative;
+      overflow: hidden;
+      transition: background 0.3s;
+    }
+    .step:hover { background: #121212; }
+    .step-num {
+      font-family: 'Syne', sans-serif;
+      font-size: 72px;
+      font-weight: 800;
+      color: var(--border2);
+      line-height: 1;
+      margin-bottom: 24px;
+      transition: color 0.3s;
+    }
+    .step:hover .step-num { color: var(--border); }
+    .step-icon {
+      font-size: 24px;
+      margin-bottom: 16px;
+    }
+    .step-title {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 18px;
+      margin-bottom: 12px;
+      letter-spacing: -0.5px;
+    }
+    .step-desc {
+      font-size: 12px;
+      line-height: 1.8;
+      color: var(--muted);
+    }
+
+    /* ── USE CASES ── */
+    .use-section {
+      padding: 120px 48px;
+      border-top: 1px solid var(--border);
+    }
+    .use-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2px;
+      margin-top: 64px;
+      background: var(--border);
+    }
+    .use-card {
+      background: var(--card);
+      padding: 40px 32px;
+      transition: background 0.3s;
+      position: relative;
+    }
+    .use-card:hover { background: #0d0d0d; }
+    .use-card::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, var(--green), transparent);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .use-card:hover::after { opacity: 1; }
+    .use-icon {
+      width: 40px; height: 40px;
+      border: 1px solid var(--border2);
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      margin-bottom: 24px;
+    }
+    .use-title {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 20px;
+      margin-bottom: 12px;
+      letter-spacing: -0.5px;
+    }
+    .use-desc {
+      font-size: 12px;
+      line-height: 1.9;
+      color: var(--muted);
+      margin-bottom: 24px;
+    }
+    .use-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+    .use-tag {
+      font-size: 9px;
+      padding: 3px 10px;
+      border: 1px solid var(--border2);
+      border-radius: 2px;
+      color: var(--muted);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    /* ── STATS ── */
+    .stats-section {
+      padding: 80px 48px;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 2px;
+      background: var(--border);
+    }
+    .stat {
+      background: var(--surface);
+      padding: 40px 32px;
+      text-align: center;
+    }
+    .stat-value {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 48px;
+      letter-spacing: -2px;
+      color: var(--green);
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+    .stat-label {
+      font-size: 10px;
+      letter-spacing: 2px;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+
+    /* ── API PREVIEW ── */
+    .api-section {
+      padding: 120px 48px;
+      border-top: 1px solid var(--border);
+    }
+    .api-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.2fr;
+      gap: 64px;
+      align-items: start;
+      margin-top: 64px;
+    }
+    .endpoint-list { display: flex; flex-direction: column; gap: 2px; }
+    .endpoint-item {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 16px 20px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      cursor: none;
+      transition: border-color 0.2s;
+    }
+    .endpoint-item:hover { border-color: var(--border2); }
+    .endpoint-item.active { border-color: var(--green); background: rgba(0,255,136,0.03); }
+    .method-badge {
+      font-size: 9px;
+      font-weight: 500;
+      padding: 3px 8px;
+      border-radius: 2px;
+      letter-spacing: 1px;
+      min-width: 42px;
+      text-align: center;
+    }
+    .get-badge  { background: rgba(0,255,136,0.1); color: var(--green); }
+    .post-badge { background: rgba(255,170,0,0.1);  color: var(--amber); }
+    .endpoint-path { font-size: 13px; color: var(--text); }
+    .endpoint-desc { font-size: 11px; color: var(--muted); margin-left: auto; }
+
+    .code-window {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .code-window-header {
+      padding: 12px 16px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .code-window-header span {
+      font-size: 10px;
+      color: var(--muted);
+      letter-spacing: 1px;
+    }
+    .code-content { padding: 24px; overflow-x: auto; }
+    .code-content pre {
+      font-size: 12px;
+      line-height: 1.8;
+      color: #888;
+    }
+    .ck { color: var(--blue); }
+    .cs { color: var(--green); }
+    .cn { color: var(--amber); }
+    .cb { color: #ff6688; }
+    .cc { color: var(--muted2); }
+
+    /* ── CTA ── */
+    .cta-section {
+      padding: 120px 48px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .cta-glow {
+      position: absolute;
+      width: 800px; height: 400px;
+      background: radial-gradient(ellipse, rgba(0,255,136,0.05) 0%, transparent 70%);
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+    }
+    .cta-title {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: clamp(40px, 6vw, 80px);
+      letter-spacing: -3px;
+      line-height: 1;
+      margin-bottom: 24px;
+      position: relative;
+    }
+    .cta-sub {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 48px;
+      position: relative;
+    }
+    .cta-buttons {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+    }
+    .url-chip {
+      background: var(--card);
+      border: 1px solid var(--border2);
+      padding: 14px 24px;
+      font-size: 12px;
+      color: var(--muted);
+      border-radius: 2px;
+      letter-spacing: 1px;
+    }
+    .url-chip span { color: var(--green); }
+
+    /* ── FOOTER ── */
+    footer {
+      padding: 40px 48px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .footer-logo {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 14px;
+      color: var(--green);
+      letter-spacing: 3px;
+    }
+    .footer-links { display: flex; gap: 32px; }
+    .footer-links a {
+      font-size: 10px;
+      color: var(--muted);
+      text-decoration: none;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      transition: color 0.2s;
+    }
+    .footer-links a:hover { color: var(--text); }
+    .footer-copy { font-size: 10px; color: var(--muted2); letter-spacing: 1px; }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(0,255,136,0.4); }
+      50%       { opacity: 0.7; box-shadow: 0 0 0 6px rgba(0,255,136,0); }
+    }
+    @keyframes ticker {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0; }
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(32px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* typing cursor */
+    .typed::after {
+      content: '█';
+      animation: blink 1s step-end infinite;
+      color: var(--green);
+      font-size: 0.8em;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Custom cursor -->
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- NAV -->
+<nav id="nav">
+  <a href="#" class="nav-logo">👻 GHOST</a>
+  <div class="nav-links">
+    <a href="#how">How it works</a>
+    <a href="#use-cases">Use cases</a>
+    <a href="#api">API</a>
+    <a href="https://project-ghost-production.up.railway.app" target="_blank" class="nav-cta">Docs →</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-glow"></div>
+  <div class="hero-content">
+    <div class="hero-badge">
+      <span class="dot"></span>
+      Signal Engine v2.0 — Live
+    </div>
+    <h1 class="hero-title">
+      <span class="line1">THE INTERNET</span>
+      <span class="line2">FOR MACHINES.</span>
+      <span class="line3">// Web intelligence infrastructure for AI agents</span>
+    </h1>
+    <p class="hero-sub">
+      AI agents shouldn't waste compute reading messy HTML.<br>
+      <strong>Ghost converts any website into clean, structured signals</strong> —
+      with entities, impact scores, and priority rankings — in under 4 seconds.
+    </p>
+    <div class="hero-actions">
+      <a href="https://project-ghost-production.up.railway.app" target="_blank" class="btn-primary">View API Docs</a>
+      <a href="#how" class="btn-secondary">See how it works ↓</a>
+    </div>
+  </div>
+</section>
+
+<!-- TICKER -->
+<div class="ticker">
+  <div class="ticker-track" id="ticker">
+    <div class="ticker-item"><span class="tag">STARTUPS</span> Yann LeCun's AMI Labs raises $1.03B <span class="score">▲ 9.2</span></div>
+    <div class="ticker-item"><span class="tag">MARKETS</span> Oil climbs above $100 on OPEC cuts <span class="score">▲ 8.7</span></div>
+    <div class="ticker-item"><span class="tag">AI</span> Google backs Nscale with $1B compute deal <span class="score">▲ 8.1</span></div>
+    <div class="ticker-item"><span class="tag">TECH</span> Founders Fund nears $6B growth vehicle <span class="score">▲ 7.9</span></div>
+    <div class="ticker-item"><span class="tag">GEOPOLITICS</span> Iran conflict drives Saudi production halt <span class="score">▲ 9.5</span></div>
+    <div class="ticker-item"><span class="tag">MARKETS</span> DeepSeek rout wipes $600B from Nvidia <span class="score">▲ 9.8</span></div>
+    <div class="ticker-item"><span class="tag">STARTUPS</span> Palmer Luckey's ModRetro seeks Series A <span class="score">▲ 6.4</span></div>
+    <div class="ticker-item"><span class="tag">TECH</span> TfL hack exposed 10M customer records <span class="score">▲ 7.3</span></div>
+    <!-- duplicate for seamless loop -->
+    <div class="ticker-item"><span class="tag">STARTUPS</span> Yann LeCun's AMI Labs raises $1.03B <span class="score">▲ 9.2</span></div>
+    <div class="ticker-item"><span class="tag">MARKETS</span> Oil climbs above $100 on OPEC cuts <span class="score">▲ 8.7</span></div>
+    <div class="ticker-item"><span class="tag">AI</span> Google backs Nscale with $1B compute deal <span class="score">▲ 8.1</span></div>
+    <div class="ticker-item"><span class="tag">TECH</span> Founders Fund nears $6B growth vehicle <span class="score">▲ 7.9</span></div>
+    <div class="ticker-item"><span class="tag">GEOPOLITICS</span> Iran conflict drives Saudi production halt <span class="score">▲ 9.5</span></div>
+    <div class="ticker-item"><span class="tag">MARKETS</span> DeepSeek rout wipes $600B from Nvidia <span class="score">▲ 9.8</span></div>
+    <div class="ticker-item"><span class="tag">STARTUPS</span> Palmer Luckey's ModRetro seeks Series A <span class="score">▲ 6.4</span></div>
+    <div class="ticker-item"><span class="tag">TECH</span> TfL hack exposed 10M customer records <span class="score">▲ 7.3</span></div>
+  </div>
+</div>
+
+<!-- LIVE DEMO -->
+<section class="demo-section">
+  <div class="reveal">
+    <div class="section-label">// Live demo</div>
+    <h2 class="section-title">Raw web → Clean signal.<br>In 3.5 seconds.</h2>
+    <p class="section-sub">One API call transforms any noisy webpage into structured intelligence your agent can act on immediately.</p>
+  </div>
+  <div class="demo-grid reveal">
+    <!-- INPUT -->
+    <div class="demo-panel">
+      <div class="panel-header">
+        <span class="panel-title">Request</span>
+        <div class="panel-dots">
+          <div class="panel-dot" style="background:#ff5f57"></div>
+          <div class="panel-dot" style="background:#ffbd2e"></div>
+          <div class="panel-dot" style="background:#28c840"></div>
+        </div>
+      </div>
+      <div class="input-panel">
+        <div class="code-line"><span class="c">// POST /distill</span></div>
+        <div class="code-line">&nbsp;</div>
+        <div class="code-line"><span class="k">fetch</span>(<span class="s">"https://project-ghost-production.up.railway.app/distill"</span>, {</div>
+        <div class="code-line">&nbsp;&nbsp;<span class="k">method</span>: <span class="s">"POST"</span>,</div>
+        <div class="code-line">&nbsp;&nbsp;<span class="k">headers</span>: {</div>
+        <div class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="s">"X-API-Key"</span>: <span class="v">YOUR_KEY</span>,</div>
+        <div class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="s">"Content-Type"</span>: <span class="s">"application/json"</span></div>
+        <div class="code-line">&nbsp;&nbsp;},</div>
+        <div class="code-line">&nbsp;&nbsp;<span class="k">body</span>: JSON.stringify({</div>
+        <div class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="k">url</span>: <span class="s">"https://techcrunch.com"</span></div>
+        <div class="code-line">&nbsp;&nbsp;})</div>
+        <div class="code-line">})</div>
+        <div class="code-line">&nbsp;</div>
+        <div class="code-line"><span class="c">// ← Returns in ~3500ms</span></div>
+      </div>
+    </div>
+
+    <!-- OUTPUT -->
+    <div class="demo-panel">
+      <div class="panel-header">
+        <span class="panel-title">Response — 200 OK &nbsp;·&nbsp; 3501ms &nbsp;·&nbsp; 4.34KB</span>
+        <div class="panel-dots">
+          <div class="panel-dot" style="background:#ff5f57"></div>
+          <div class="panel-dot" style="background:#ffbd2e"></div>
+          <div class="panel-dot" style="background:#28c840"></div>
+        </div>
+      </div>
+      <div class="output-panel">
+        <div class="signal-card">
+          <div class="signal-meta">
+            <span class="signal-category">STARTUPS</span>
+            <span class="signal-score">impact <span>9.2</span> · priority <span>8.4</span></span>
+          </div>
+          <div class="signal-title">Yann LeCun's AMI Labs raises $1.03B at $3.5B valuation after leaving Meta</div>
+          <div class="signal-entities">
+            <span class="entity-tag">AMI Labs</span>
+            <span class="entity-tag">Yann LeCun</span>
+            <span class="entity-tag">Meta</span>
+          </div>
+        </div>
+        <div class="signal-card amber">
+          <div class="signal-meta">
+            <span class="signal-category">GEOPOLITICS</span>
+            <span class="signal-score">impact <span>8.1</span> · priority <span>7.6</span></span>
+          </div>
+          <div class="signal-title">Russian espionage group used iPhone hacking tools sourced from US military contractor</div>
+          <div class="signal-entities">
+            <span class="entity-tag">Google</span>
+            <span class="entity-tag">FSB</span>
+            <span class="entity-tag">Apple</span>
+          </div>
+        </div>
+        <div class="signal-card blue">
+          <div class="signal-meta">
+            <span class="signal-category">FINANCE</span>
+            <span class="signal-score">impact <span>7.9</span> · priority <span>7.9</span></span>
+          </div>
+          <div class="signal-title">Founders Fund nears $6B close for latest growth fund, less than a year after $4.6B vehicle</div>
+          <div class="signal-entities">
+            <span class="entity-tag">Founders Fund</span>
+            <span class="entity-tag">Peter Thiel</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats-section">
+  <div class="stats-grid reveal">
+    <div class="stat">
+      <div class="stat-value">3.5s</div>
+      <div class="stat-label">Avg response time</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">10+</div>
+      <div class="stat-label">Sources monitored</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">~50%</div>
+      <div class="stat-label">Token reduction</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">v2.0</div>
+      <div class="stat-label">Schema version</div>
+    </div>
+  </div>
+</div>
+
+<!-- TRUSTED BY -->
+<div class="trusted-section">
+  <div class="trusted-label reveal">// Trusted by</div>
+  <div class="trusted-track reveal">
+    <div class="trusted-logo">
+      <span class="tl-icon">◈</span>
+      <span class="tl-name">Findyble</span>
+    </div>
+    <div class="trusted-div"></div>
+    <div class="trusted-logo">
+      <span class="tl-icon">◉</span>
+      <span class="tl-name">Mocially</span>
+    </div>
+    <div class="trusted-div"></div>
+    <div class="trusted-logo">
+      <span class="tl-icon">⬡</span>
+      <span class="tl-name">Terch DataLabs</span>
+    </div>
+    <div class="trusted-div"></div>
+    <div class="trusted-logo">
+      <span class="tl-icon">◎</span>
+      <span class="tl-name">ScaleGuide</span>
+    </div>
+    <div class="trusted-div"></div>
+    <div class="trusted-logo">
+      <span class="tl-icon">⬢</span>
+      <span class="tl-name">BenchWatt</span>
+    </div>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<section class="how-section" id="how">
+  <div class="reveal">
+    <div class="section-label">// How it works</div>
+    <h2 class="section-title">Four steps.<br>Zero noise.</h2>
+  </div>
+  <div class="steps reveal">
+    <div class="step">
+      <div class="step-num">01</div>
+      <div class="step-icon">🌐</div>
+      <div class="step-title">Fetch</div>
+      <div class="step-desc">Ghost fetches any URL — HTML pages, RSS feeds, JSON APIs. Blocked sites automatically fall back to their public RSS endpoints.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">02</div>
+      <div class="step-icon">🧹</div>
+      <div class="step-title">Clean</div>
+      <div class="step-desc">All scripts, styles, ads, and navigation are stripped. Raw text is parsed into structured headlines — cutting content by up to 50%.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">03</div>
+      <div class="step-icon">🧠</div>
+      <div class="step-title">Extract</div>
+      <div class="step-desc">Groq LLM extracts entities, impact scores, summaries, and business intent. Priority is calculated server-side — never hallucinated.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">04</div>
+      <div class="step-icon">⚡</div>
+      <div class="step-title">Signal</div>
+      <div class="step-desc">A clean Ghost Signal is returned and stored in Supabase. Your agent reads structured JSON — not a wall of text — and acts instantly.</div>
+    </div>
+  </div>
+</section>
+
+<!-- USE CASES -->
+<section class="use-section" id="use-cases">
+  <div class="reveal">
+    <div class="section-label">// Use cases</div>
+    <h2 class="section-title">Built for teams<br>that can't afford to be slow.</h2>
+  </div>
+  <div class="use-grid reveal">
+    <div class="use-card">
+      <div class="use-icon">💹</div>
+      <div class="use-title">Finance & Trading</div>
+      <div class="use-desc">Detect market-moving events the moment they break. Feed structured signals directly into trading bots, risk engines, or analyst dashboards without manual monitoring.</div>
+      <div class="use-tags">
+        <span class="use-tag">Market signals</span>
+        <span class="use-tag">Geopolitical risk</span>
+        <span class="use-tag">Earnings alerts</span>
+      </div>
+    </div>
+    <div class="use-card">
+      <div class="use-icon">🎯</div>
+      <div class="use-title">Sales Intelligence</div>
+      <div class="use-desc">Know the moment a target company raises funding, launches a product, or hires a new VP. Trigger outreach automatically when the signal score crosses your threshold.</div>
+      <div class="use-tags">
+        <span class="use-tag">Funding rounds</span>
+        <span class="use-tag">Product launches</span>
+        <span class="use-tag">CRM enrichment</span>
+      </div>
+    </div>
+    <div class="use-card">
+      <div class="use-icon">🤖</div>
+      <div class="use-title">AI Agent Pipelines</div>
+      <div class="use-desc">Give your agents a real-time signal feed via MCP. Ghost works natively with Cursor, Claude, and any MCP-compatible framework as a plug-and-play intelligence layer.</div>
+      <div class="use-tags">
+        <span class="use-tag">MCP protocol</span>
+        <span class="use-tag">Agent memory</span>
+        <span class="use-tag">Real-time feed</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- API PREVIEW -->
+<section class="api-section" id="api">
+  <div class="reveal">
+    <div class="section-label">// API reference</div>
+    <h2 class="section-title">Three endpoints.<br>Infinite signal.</h2>
+    <p class="section-sub">Simple REST API. No SDK required. Works with any language that can make an HTTP request.</p>
+  </div>
+  <div class="api-grid reveal">
+    <div class="endpoint-list">
+      <div class="endpoint-item active">
+        <span class="method-badge post-badge">POST</span>
+        <span class="endpoint-path">/distill</span>
+        <span class="endpoint-desc">Any URL → Signal</span>
+      </div>
+      <div class="endpoint-item">
+        <span class="method-badge get-badge">GET</span>
+        <span class="endpoint-path">/feed</span>
+        <span class="endpoint-desc">Poll cached signals</span>
+      </div>
+      <div class="endpoint-item">
+        <span class="method-badge get-badge">GET</span>
+        <span class="endpoint-path">/search</span>
+        <span class="endpoint-desc">Search by entity</span>
+      </div>
+      <div class="endpoint-item">
+        <span class="method-badge get-badge">GET</span>
+        <span class="endpoint-path">/health</span>
+        <span class="endpoint-desc">Liveness check</span>
+      </div>
+      <div class="endpoint-item" style="border-top: 2px solid var(--border2); margin-top: 12px;">
+        <span class="method-badge" style="background:rgba(0,170,255,0.1);color:var(--blue);font-size:9px;min-width:42px;text-align:center;padding:3px 8px;border-radius:2px;">MCP</span>
+        <span class="endpoint-path">/mcp</span>
+        <span class="endpoint-desc">Agent tools</span>
+      </div>
+    </div>
+    <div class="code-window">
+      <div class="code-window-header">
+        <div class="panel-dot" style="background:#ff5f57;width:10px;height:10px;border-radius:50%"></div>
+        <div class="panel-dot" style="background:#ffbd2e;width:10px;height:10px;border-radius:50%"></div>
+        <div class="panel-dot" style="background:#28c840;width:10px;height:10px;border-radius:50%"></div>
+        <span>response.json</span>
+      </div>
+      <div class="code-content">
+        <pre>{
+  <span class="ck">"success"</span>: <span class="cb">true</span>,
+  <span class="ck">"signal"</span>: {
+    <span class="ck">"title"</span>:        <span class="cs">"TechCrunch"</span>,
+    <span class="ck">"tokens_saved"</span>: <span class="cs">"51.2%"</span>,
+    <span class="ck">"confidence"</span>:   <span class="cn">0.847</span>,
+    <span class="ck">"decision_signal"</span>: {
+      <span class="ck">"business_intent"</span>: <span class="cs">"AI funding is accelerating with billion-dollar rounds signalling renewed institutional confidence in foundation model infrastructure."</span>,
+      <span class="ck">"priority_score"</span>:  <span class="cn">8.4</span>,
+      <span class="ck">"category"</span>:        <span class="cs">"STARTUPS"</span>
+    },
+    <span class="ck">"items"</span>: [
+      {
+        <span class="ck">"title"</span>:       <span class="cs">"AMI Labs raises $1.03B..."</span>,
+        <span class="ck">"entities"</span>:    [<span class="cs">"AMI Labs"</span>, <span class="cs">"Yann LeCun"</span>],
+        <span class="ck">"impact_score"</span>: <span class="cn">9.2</span>,
+        <span class="ck">"summary"</span>:      <span class="cs">"Yann LeCun's new venture raises $1B+..."</span>
+      }
+    ]
+  },
+  <span class="ck">"meta"</span>: { <span class="ck">"processing_time_ms"</span>: <span class="cn">3501</span> }
+}</pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <div class="cta-glow"></div>
+  <h2 class="cta-title reveal">Start reading<br><span style="color:var(--green)">the web</span><br>like a machine.</h2>
+  <p class="cta-sub reveal">Live API. No waitlist. Start with the /health endpoint.</p>
+  <div class="cta-buttons reveal">
+    <a href="https://project-ghost-production.up.railway.app" target="_blank" class="btn-primary">Read the Docs</a>
+    <div class="url-chip"><span>POST</span> project-ghost-production.up.railway.app/distill</div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">👻 GHOST</div>
+  <div class="footer-links">
+    <a href="#how">How it works</a>
+    <a href="#api">API</a>
+    <a href="https://project-ghost-production.up.railway.app" target="_blank">Docs</a>
+  </div>
+  <div class="footer-copy">Project Ghost v2.0 · Web Intelligence Infrastructure</div>
+</footer>
+
+<script>
+  // Custom cursor
+  const cursor = document.getElementById('cursor');
+  const ring   = document.getElementById('cursorRing');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+  document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+  (function animCursor() {
+    rx += (mx - rx) * 0.15;
+    ry += (my - ry) * 0.15;
+    cursor.style.left = mx - 4 + 'px';
+    cursor.style.top  = my - 4 + 'px';
+    ring.style.left   = rx - 16 + 'px';
+    ring.style.top    = ry - 16 + 'px';
+    requestAnimationFrame(animCursor);
+  })();
+
+  // Nav scroll
+  const nav = document.getElementById('nav');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', window.scrollY > 40);
+  });
+
+  // Scroll reveal
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        // stagger children
+        e.target.querySelectorAll('.step, .use-card, .stat, .endpoint-item').forEach((el, i) => {
+          el.style.transitionDelay = i * 0.08 + 's';
+          el.style.opacity = '0';
+          el.style.transform = 'translateY(20px)';
+          setTimeout(() => {
+            el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+            el.style.opacity = '1';
+            el.style.transform = 'translateY(0)';
+          }, 100 + i * 80);
+        });
+      }
+    });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
