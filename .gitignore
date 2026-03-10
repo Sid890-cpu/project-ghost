@@ -1,11 +1,21 @@
-# Secret Keys (NEVER UPLOAD THESE)
+# ── Secrets — NEVER commit these ──────────────────
 .env
+.env.*
+*.env
+secrets.py
+config.py
 
-# Python junk
+# ── Python ─────────────────────────────────────────
 __pycache__/
+*.py[cod]
 .venv/
+venv/
 .pytest_cache/
 
-# Local Data
-*.json
+# ── Local data & reports ───────────────────────────
+distilled_data.json
 *.png
+
+# ── OS junk ────────────────────────────────────────
+.DS_Store
+Thumbs.db
