@@ -13,6 +13,7 @@ from starlette.requests import Request
 from starlette.responses import JSONResponse, HTMLResponse
 from starlette.routing import Route, Mount
 from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.middleware.cors import CORSMiddleware
 import uvicorn
 
 load_dotenv()
@@ -710,6 +711,12 @@ app = Starlette(
     ]
 )
 app.add_middleware(TimingMiddleware)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 if __name__ == "__main__":
