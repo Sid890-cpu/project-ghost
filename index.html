@@ -64,13 +64,15 @@
     .ticker-item{display:inline-flex;align-items:center;gap:10px;padding:0 36px;border-right:1px solid var(--border);font-family:'DM Mono',monospace;font-size:11px;color:var(--muted2)}
     .t-cat{color:var(--green);font-size:10px;letter-spacing:1px}
     .t-score{color:var(--amber)}
-    .logos-section{position:relative;z-index:10;padding:48px 64px;border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:var(--deep)}
-    .logos-label{text-align:center;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:32px}
-    .logos-row{display:flex;align-items:center;justify-content:center;gap:56px;flex-wrap:wrap}
-    .logo-item{display:flex;align-items:center;gap:10px;opacity:0.35;transition:opacity 0.3s}
-    .logo-item:hover{opacity:0.75}
-    .logo-mark{width:32px;height:32px;border:1px solid var(--border2);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--green);font-family:'DM Mono',monospace;font-weight:500}
-    .logo-name{font-size:14px;font-weight:500;color:var(--text)}
+    .logos-section{position:relative;z-index:10;padding:64px;border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:var(--deep)}
+    .logos-label{text-align:center;font-size:11px;letter-spacing:4px;text-transform:uppercase;color:var(--muted);margin-bottom:48px}
+    .logos-row{display:flex;align-items:center;justify-content:center;gap:0;flex-wrap:wrap}
+    .logo-item{display:flex;align-items:center;gap:14px;padding:0 48px;opacity:0.5;transition:all 0.3s;border-right:1px solid var(--border)}
+    .logo-item:last-child{border-right:none}
+    .logo-item:hover{opacity:1}
+    .logo-mark{width:44px;height:44px;border:1px solid var(--border2);border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:13px;font-weight:600;color:var(--green);background:var(--card);flex-shrink:0;transition:all 0.3s}
+    .logo-item:hover .logo-mark{border-color:var(--green);background:var(--green-bg)}
+    .logo-name{font-family:'DM Serif Display',serif;font-size:20px;font-weight:400;color:var(--white);letter-spacing:0.3px;white-space:nowrap}
     section{position:relative;z-index:10}
     .section-wrap{padding:112px 64px}
     .section-tag{display:inline-flex;align-items:center;gap:8px;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--green);margin-bottom:20px}
@@ -193,7 +195,9 @@
       .stat-cell:nth-child(2){border-right:none}
       .stat-cell:nth-child(3){border-top:1px solid var(--border)}
       .stat-cell:nth-child(4){border-top:1px solid var(--border);border-right:none}
-      .logos-row{gap:24px}
+      .logos-row{gap:0;flex-direction:column}
+      .logo-item{border-right:none;border-bottom:1px solid var(--border);padding:20px 32px;width:100%;justify-content:center}
+      .logo-item:last-child{border-bottom:none}
       .logos-section{padding:40px 16px}
       footer{flex-direction:column;gap:20px;text-align:center;padding:32px 16px}
       .footer-links{flex-wrap:wrap;justify-content:center;gap:16px}
@@ -228,8 +232,8 @@
       .stat-num{font-size:30px}
       .logos-section{padding:28px 16px}
       .logos-row{gap:12px}
-      .logo-name{font-size:11px}
-      .logo-mark{width:26px;height:26px;font-size:10px}
+      .logo-name{font-size:18px}
+      .logo-mark{width:38px;height:38px}
       .cta-inner{padding:56px 16px}
       .cta-btns{flex-direction:column;align-items:stretch}
       .btn-hp,.btn-hs{width:100%;justify-content:center;text-align:center}
