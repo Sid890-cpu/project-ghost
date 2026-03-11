@@ -59,11 +59,11 @@
     .metric-val{font-family:'DM Mono',monospace;font-size:28px;font-weight:500;color:var(--white);line-height:1;margin-bottom:6px}
     .metric-val span{color:var(--green)}
     .metric-label{font-size:12px;color:var(--muted)}
-    .ticker-wrap{position:relative;z-index:10;overflow:hidden;background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:14px 0}
+    .ticker-wrap{position:relative;z-index:10;overflow:hidden;background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:18px 0}
     .ticker-track{display:flex;animation:scroll 35s linear infinite;white-space:nowrap}
-    .ticker-item{display:inline-flex;align-items:center;gap:10px;padding:0 36px;border-right:1px solid var(--border);font-family:'DM Mono',monospace;font-size:11px;color:var(--muted2)}
-    .t-cat{color:var(--green);font-size:10px;letter-spacing:1px}
-    .t-score{color:var(--amber)}
+    .ticker-item{display:inline-flex;align-items:center;gap:12px;padding:0 40px;border-right:1px solid var(--border);font-family:'DM Mono',monospace;font-size:13px;color:var(--text)}
+    .t-cat{color:var(--green);font-size:11px;letter-spacing:2px;font-weight:500;background:rgba(0,229,160,0.08);border:1px solid rgba(0,229,160,0.2);padding:2px 8px;border-radius:4px}
+    .t-score{color:var(--amber);font-weight:500}
     .logos-section{position:relative;z-index:10;padding:64px;border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:var(--deep)}
     .logos-label{text-align:center;font-size:11px;letter-spacing:4px;text-transform:uppercase;color:var(--muted);margin-bottom:48px}
     .logos-row{display:flex;align-items:center;justify-content:center;gap:0;flex-wrap:wrap}
@@ -313,12 +313,28 @@
 
 <div class="logos-section">
   <p class="logos-label">Trusted by</p>
-  <div class="logos-row">
-    <div class="logo-item"><div class="logo-mark">Fy</div><span class="logo-name">Findyble</span></div>
-    <div class="logo-item"><div class="logo-mark">Mc</div><span class="logo-name">Mocially</span></div>
-    <div class="logo-item"><div class="logo-mark">TD</div><span class="logo-name">Terch DataLabs</span></div>
-    <div class="logo-item"><div class="logo-mark">Sg</div><span class="logo-name">ScaleGuide</span></div>
-    <div class="logo-item"><div class="logo-mark">Bw</div><span class="logo-name">BenchWatt</span></div>
+  <div class="logos-row reveal">
+    <div class="logo-item">
+      <div class="logo-mark"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/><path d="M11 8v6M8 11h6"/></svg></div>
+      <span class="logo-name">Findyble</span>
+    </div>
+    <div class="logo-item">
+      <div class="logo-mark"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+      <span class="logo-name">Mocially</span>
+    </div>
+    <div class="logo-item">
+      <div class="logo-mark"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 4.03 3 9 3s9-1.34 9-3V5"/><path d="M3 12c0 1.66 4.03 3 9 3s9-1.34 9-3"/></svg></div>
+      <span class="logo-name">Terch DataLabs</span>
+    </div>
+    <div class="logo-item">
+      <div class="logo-mark"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 20h20M6 20V10l6-6 6 6v10"/><path d="M10 20v-5h4v5"/></svg></div>
+      <span class="logo-name">ScaleGuide</span>
+    </div>
+    <div class="logo-item">
+      <div class="logo-mark"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
+      <span class="logo-name">BenchWatt</span>
+    </div>
+  </div>
   </div>
 </div>
 
