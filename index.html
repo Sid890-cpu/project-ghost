@@ -170,48 +170,61 @@
     .footer-right{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted)}
     /* ── RESPONSIVE ── */
     @media(max-width:900px){
-      nav{padding:0 24px}
+      nav{padding:0 20px}
       .nav-center{display:none}
       .btn-ghost{display:none}
-      .hero{padding:100px 24px 60px}
-      .hero-metrics{flex-wrap:wrap;max-width:400px}
-      .metric{padding:16px 24px;flex:1 1 40%}
+      .hero{padding:100px 20px 60px}
+      .hero-eyebrow{font-size:11px;padding:5px 12px 5px 8px;text-align:center}
+      .eyebrow-text{white-space:normal;text-align:center;line-height:1.4}
+      .hero-metrics{width:100%;flex-wrap:wrap;border-radius:10px}
+      .metric{flex:1 1 45%;padding:16px 12px}
       .metric:nth-child(2){border-right:none}
-      .section-wrap{padding:72px 24px}
+      .metric:nth-child(3){border-top:1px solid var(--border)}
+      .metric:nth-child(4){border-top:1px solid var(--border);border-right:none}
+      .section-wrap{padding:72px 20px}
       .arch-grid{grid-template-columns:1fr;gap:40px}
       .arch-features{grid-template-columns:1fr 1fr}
       .demo-layout{grid-template-columns:1fr}
       .cases-grid{grid-template-columns:1fr}
       .api-grid{grid-template-columns:1fr}
-      .stats-inner{grid-template-columns:1fr 1fr}
+      .stats-banner{padding:40px 20px}
+      .stats-inner{grid-template-columns:1fr 1fr;width:100%}
       .stat-cell:nth-child(2){border-right:none}
-      .logos-row{gap:32px}
-      .logos-section{padding:40px 24px}
-      footer{flex-direction:column;gap:20px;text-align:center;padding:32px 24px}
-      .footer-links{flex-wrap:wrap;justify-content:center;gap:20px}
-      .ticker-item{padding:0 20px}
+      .stat-cell:nth-child(3){border-top:1px solid var(--border)}
+      .stat-cell:nth-child(4){border-top:1px solid var(--border);border-right:none}
+      .logos-row{gap:24px}
+      .logos-section{padding:40px 20px}
+      footer{flex-direction:column;gap:20px;text-align:center;padding:32px 20px}
+      .footer-links{flex-wrap:wrap;justify-content:center;gap:16px}
+      .footer-right{display:none}
+      .ticker-item{padding:0 16px}
+
     }
     @media(max-width:600px){
-      .hero-title{font-size:38px;letter-spacing:-0.5px}
+      .hero-title{font-size:36px;letter-spacing:-0.5px;line-height:1.1}
       .hero-sub{font-size:15px}
       .hero-cta{flex-direction:column;width:100%}
       .btn-hp,.btn-hs{width:100%;justify-content:center}
-      .hero-metrics{max-width:100%;flex-direction:column}
-      .metric{border-right:none !important;border-bottom:1px solid var(--border)}
+      .hero-metrics{flex-direction:column;width:100%}
+      .metric{width:100%;border-right:none !important;border-bottom:1px solid var(--border);border-top:none !important}
       .metric:last-child{border-bottom:none}
-      .section-title{font-size:28px}
+      .section-title{font-size:26px}
       .arch-features{grid-template-columns:1fr}
-      .stats-inner{grid-template-columns:1fr}
-      .stat-cell{border-right:none !important;border-bottom:1px solid var(--border)}
+      .stats-inner{grid-template-columns:1fr;width:100%}
+      .stat-cell{border-right:none !important;border-top:none !important;border-bottom:1px solid var(--border)}
       .stat-cell:last-child{border-bottom:none}
-      .logos-row{gap:20px}
+      .stat-num{font-size:36px}
+      .logos-row{gap:16px}
       .logo-name{font-size:12px}
-      .cta-inner{padding:72px 24px}
-      .cta-btns{flex-direction:column;align-items:center}
+      .cta-inner{padding:64px 20px}
+      .cta-btns{flex-direction:column;align-items:stretch}
       .btn-hp,.btn-hs{width:100%;justify-content:center;text-align:center}
-      .api-grid{gap:32px}
-      nav{padding:0 20px}
+      .api-grid{gap:24px}
+      .ep-desc{display:none}
+      .code-bdy pre{font-size:11px}
+      nav{padding:0 16px}
       .btn-solid{padding:7px 14px;font-size:11px}
+      .nav-logo-text{font-size:13px}
     }
     @keyframes rise{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
     @keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(0,229,160,0.4)}50%{opacity:0.7;box-shadow:0 0 0 5px rgba(0,229,160,0)}}
