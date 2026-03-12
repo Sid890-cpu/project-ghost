@@ -226,8 +226,30 @@
     .try-error{padding:16px 20px;font-family:'DM Mono',monospace;font-size:12px;color:#ff6b6b;background:rgba(255,107,107,0.06);border-top:1px solid rgba(255,107,107,0.15)}
     @keyframes spin{to{transform:rotate(360deg)}}
     .contact-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:48px}
-    .contact-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:32px;display:flex;flex-direction:column;gap:12px;transition:all 0.3s}
-    .contact-card:hover{border-color:var(--green);transform:translateY(-3px)}
+    .contact-layout{display:grid;grid-template-columns:1fr 1.3fr;gap:40px;margin-top:48px;align-items:start}
+    .contact-left{display:flex;flex-direction:column;gap:14px}
+    .contact-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:22px;display:flex;flex-direction:column;gap:8px;transition:all 0.3s}
+    .contact-card:hover{border-color:var(--green);transform:translateY(-2px)}
+    .contact-direct{display:flex;align-items:center;gap:10px;padding:12px 0;flex-wrap:wrap}
+    .contact-direct-label{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);letter-spacing:1px}
+    .contact-direct-email{font-family:'DM Mono',monospace;font-size:13px;color:var(--green);text-decoration:none;border-bottom:1px solid rgba(0,229,160,0.3);padding-bottom:2px;transition:border-color 0.2s}
+    .contact-direct-email:hover{border-color:var(--green)}
+    .contact-form-wrap{display:flex;justify-content:center;margin-top:48px}
+    .contact-form-box{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:36px;display:flex;flex-direction:column;gap:18px;width:100%;max-width:560px}
+    .cf-title{font-size:18px;font-weight:700;color:var(--white)}
+    .cf-subtitle{font-size:13px;color:var(--muted2);margin-top:-6px}
+    .cf-field{display:flex;flex-direction:column;gap:7px}
+    .cf-label{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase}
+    .cf-input{background:var(--surface);border:1px solid var(--border2);border-radius:8px;padding:11px 14px;color:var(--white);font-size:14px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color 0.2s;width:100%;box-sizing:border-box}
+    .cf-input:focus{border-color:var(--green)}
+    .cf-input::placeholder{color:var(--muted)}
+    .cf-textarea{resize:vertical;min-height:110px;line-height:1.6}
+    .cf-btn{background:var(--green);color:#000;font-weight:700;font-size:14px;border:none;border-radius:8px;padding:13px 24px;cursor:pointer;transition:all 0.2s}
+    .cf-btn:hover{background:#00ffb3;transform:translateY(-1px)}
+    .cf-btn:disabled{opacity:0.6;cursor:not-allowed;transform:none}
+    .cf-status{font-size:13px;text-align:center;min-height:18px;font-family:'DM Mono',monospace}
+    .cf-status.success{color:var(--green)}
+    .cf-status.error{color:#ff6b6b}
     .cc-icon{font-size:28px}
     .cc-title{font-size:16px;font-weight:600;color:var(--white)}
     .cc-desc{font-size:13px;color:var(--muted2);line-height:1.7;flex:1}
@@ -254,7 +276,7 @@
       .demo-layout{grid-template-columns:1fr}
       .cases-grid{grid-template-columns:1fr}
       .api-grid{grid-template-columns:1fr}
-      .contact-grid{grid-template-columns:1fr}
+      .contact-layout{grid-template-columns:1fr}.contact-grid{grid-template-columns:1fr}
       .try-input-row{flex-direction:column;align-items:stretch}
       .try-key{width:100%}
       .try-result-body{grid-template-columns:1fr}
@@ -288,7 +310,7 @@
       .section-wrap{padding:56px 16px}
       .section-title{font-size:26px}
       .arch-features{grid-template-columns:1fr}
-      .contact-grid{grid-template-columns:1fr}
+      .contact-layout{grid-template-columns:1fr}.contact-grid{grid-template-columns:1fr}
       .stats-banner{padding:28px 16px}
       .stats-inner{grid-template-columns:1fr 1fr !important;width:100%}
       .stat-cell{padding:24px 12px}
@@ -349,12 +371,6 @@
     <a href="https://project-ghost-production.up.railway.app" target="_blank" class="btn-hs">Developer Docs <span>↗</span></a>
     <a href="#contact" class="btn-hs">Contact</a>
     <a href="#architecture" class="btn-hs">Architecture</a>
-  </div>
-  <div class="hero-metrics">
-    <div class="metric"><div class="metric-val"><span>3.5</span>s</div><div class="metric-label">Avg. response time</div></div>
-    <div class="metric"><div class="metric-val"><span>~50</span>%</div><div class="metric-label">Token reduction</div></div>
-    <div class="metric"><div class="metric-val"><span>10</span>+</div><div class="metric-label">Live sources</div></div>
-    <div class="metric"><div class="metric-val"><span>0.9</span>+</div><div class="metric-label">Confidence score</div></div>
   </div>
 </section>
 
@@ -629,24 +645,29 @@ GET /search?<span class="tp">q</span>=<span class="ts">nvidia</span>&amp;<span c
       <h2 class="section-title">Get in touch.</h2>
       <p class="section-sub">Interested in API access, partnerships, or enterprise pricing? We'd love to hear from you.</p>
     </div>
-    <div class="contact-grid reveal">
-      <div class="contact-card">
-        <div class="cc-icon">📬</div>
-        <div class="cc-title">API Access</div>
-        <div class="cc-desc">Request an API key and start integrating Ghost into your agent pipeline.</div>
-        <a href="mailto:hello@projectghost.ai" class="cc-btn">hello@projectghost.ai ↗</a>
-      </div>
-      <div class="contact-card">
-        <div class="cc-icon">🤝</div>
-        <div class="cc-title">Partnerships</div>
-        <div class="cc-desc">Building something that could benefit from real-time web intelligence? Let's talk.</div>
-        <a href="mailto:hello@projectghost.ai" class="cc-btn">Get in touch ↗</a>
-      </div>
-      <div class="contact-card">
-        <div class="cc-icon">💼</div>
-        <div class="cc-title">Enterprise</div>
-        <div class="cc-desc">Custom signal feeds, dedicated infrastructure, and SLA guarantees for teams.</div>
-        <a href="mailto:hello@projectghost.ai" class="cc-btn">Contact sales ↗</a>
+
+    <div class="contact-form-wrap reveal">
+      <div class="contact-form-box">
+        <div class="cf-title">Send us a message</div>
+        <div class="cf-subtitle">We typically respond within 24 hours.</div>
+        <div class="cf-field">
+          <label class="cf-label">Your Name</label>
+          <input type="text" id="cf-name" class="cf-input" placeholder="John Smith" />
+        </div>
+        <div class="cf-field">
+          <label class="cf-label">Email Address</label>
+          <input type="email" id="cf-email" class="cf-input" placeholder="john@company.com" />
+        </div>
+        <div class="cf-field">
+          <label class="cf-label">Message</label>
+          <textarea id="cf-message" class="cf-input cf-textarea" placeholder="Tell us what you're building..."></textarea>
+        </div>
+        <button class="cf-btn" onclick="sendContactForm()">Send Message →</button>
+        <div id="cf-status" class="cf-status"></div>
+        <div class="contact-direct">
+          <span class="contact-direct-label">Or email us directly →</span>
+          <a href="mailto:ProjectGhost__@outlook.com" class="contact-direct-email">ProjectGhost__@outlook.com</a>
+        </div>
       </div>
     </div>
   </div>
@@ -701,7 +722,7 @@ GET /search?<span class="tp">q</span>=<span class="ts">nvidia</span>&amp;<span c
         body.innerHTML = `<div class="try-blocked">
           <div class="try-blocked-icon">🚫</div>
           <div class="try-blocked-title">Site blocked our scraper</div>
-          <div class="try-blocked-msg">${new URL(url).hostname} uses Cloudflare or paywall protection. Try: <span class="try-sugg" onclick="document.getElementById('tryUrl').value='https://apple.com';runTry()">apple.com</span>, <span class="try-sugg" onclick="document.getElementById('tryUrl').value='https://github.com/trending';runTry()">github.com/trending</span>, or <span class="try-sugg" onclick="document.getElementById('tryUrl').value='https://news.ycombinator.com';runTry()">news.ycombinator.com</span></div>
+          <div class="try-blocked-msg">${new URL(url).hostname} has aggressive bot protection that blocks even advanced scrapers. Try: <span class="try-sugg" onclick="document.getElementById('tryUrl').value='https://apple.com';runTry()">apple.com</span>, <span class="try-sugg" onclick="document.getElementById('tryUrl').value='https://github.com/trending';runTry()">github.com/trending</span>, or <span class="try-sugg" onclick="document.getElementById('tryUrl').value='https://news.ycombinator.com';runTry()">news.ycombinator.com</span></div>
         </div>`;
         return;
       }
@@ -786,6 +807,34 @@ GET /search?<span class="tp">q</span>=<span class="ts">nvidia</span>&amp;<span c
     });
   }, {threshold:0.5});
   document.querySelectorAll('.res-card').forEach(el => barIO.observe(el));
+
+  function sendContactForm() {
+    const name = document.getElementById('cf-name').value.trim();
+    const email = document.getElementById('cf-email').value.trim();
+    const message = document.getElementById('cf-message').value.trim();
+    const status = document.getElementById('cf-status');
+    const btn = document.querySelector('.cf-btn');
+
+    if (!name || !email || !message) {
+      status.textContent = '⚠ Please fill in all fields.';
+      status.className = 'cf-status error';
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      status.textContent = '⚠ Please enter a valid email address.';
+      status.className = 'cf-status error';
+      return;
+    }
+
+    const subject = encodeURIComponent(`Project Ghost Inquiry from ${name}`);
+    const body = encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`);
+    window.location.href = `mailto:ProjectGhost__@outlook.com?subject=${subject}&body=${body}`;
+
+    btn.disabled = true;
+    status.textContent = '✓ Opening your email client...';
+    status.className = 'cf-status success';
+    setTimeout(() => { btn.disabled = false; status.textContent = ''; }, 4000);
+  }
 </script>
 </body>
 </html>
