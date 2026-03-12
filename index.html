@@ -48,10 +48,10 @@
     .hero-title em{font-style:italic;color:var(--green)}
     .hero-sub{font-size:17px;line-height:1.75;color:var(--muted2);max-width:600px;margin-bottom:48px;font-weight:300;opacity:0;animation:rise 0.7s ease 0.4s forwards}
     .hero-sub strong{color:var(--text);font-weight:500}
-    .hero-cta{display:flex;gap:14px;align-items:center;margin-bottom:72px;opacity:0;animation:rise 0.7s ease 0.55s forwards}
-    .btn-hp{padding:14px 32px;background:var(--green);color:var(--black);font-size:15px;font-weight:600;border-radius:8px;text-decoration:none;border:none;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;gap:8px}
+    .hero-cta{display:grid;grid-template-columns:1fr 1fr;gap:12px;width:100%;max-width:480px;margin-bottom:56px;opacity:0;animation:rise 0.7s ease 0.55s forwards}
+    .btn-hp{padding:16px 24px;background:var(--green);color:var(--black);font-size:14px;font-weight:600;border-radius:8px;text-decoration:none;border:none;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:8px}
     .btn-hp:hover{background:var(--green-d);transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,229,160,0.25)}
-    .btn-hs{padding:14px 32px;background:transparent;color:var(--text);font-size:15px;font-weight:400;border-radius:8px;text-decoration:none;border:1px solid var(--border2);transition:all 0.2s;display:flex;align-items:center;gap:8px}
+    .btn-hs{padding:16px 24px;background:transparent;color:var(--text);font-size:14px;font-weight:400;border-radius:8px;text-decoration:none;border:1px solid var(--border2);transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:8px}
     .btn-hs:hover{border-color:var(--muted2);background:rgba(255,255,255,0.03)}
     .hero-metrics{display:flex;border:1px solid var(--border);border-radius:10px;overflow:hidden;background:var(--surface);opacity:0;animation:rise 0.7s ease 0.7s forwards}
     .metric{padding:20px 40px;border-right:1px solid var(--border);text-align:center}
@@ -59,20 +59,23 @@
     .metric-val{font-family:'DM Mono',monospace;font-size:28px;font-weight:500;color:var(--white);line-height:1;margin-bottom:6px}
     .metric-val span{color:var(--green)}
     .metric-label{font-size:12px;color:var(--muted)}
-    .ticker-wrap{position:relative;z-index:10;overflow:hidden;background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:18px 0}
-    .ticker-track{display:flex;animation:scroll 35s linear infinite;white-space:nowrap}
-    .ticker-item{display:inline-flex;align-items:center;gap:12px;padding:0 40px;border-right:1px solid var(--border);font-family:'DM Mono',monospace;font-size:13px;color:var(--text)}
-    .t-cat{color:var(--green);font-size:11px;letter-spacing:2px;font-weight:500;background:rgba(0,229,160,0.08);border:1px solid rgba(0,229,160,0.2);padding:2px 8px;border-radius:4px}
-    .t-score{color:var(--amber);font-weight:500}
-    .logos-section{position:relative;z-index:10;padding:40px 64px;border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:var(--deep)}
-    .logos-label{text-align:center;font-size:11px;letter-spacing:4px;text-transform:uppercase;color:var(--muted);margin-bottom:32px}
-    .logos-row{display:flex;align-items:center;justify-content:center;gap:0;flex-wrap:nowrap;overflow-x:auto}
-    .logo-item{display:flex;align-items:center;gap:10px;padding:0 32px;opacity:0.6;transition:all 0.3s;border-right:1px solid var(--border);flex-shrink:0}
-    .logo-item:last-child{border-right:none}
-    .logo-item:hover{opacity:1}
-    .logo-mark{width:34px;height:34px;border:1px solid var(--border2);border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--green);background:var(--card);flex-shrink:0;transition:all 0.3s}
-    .logo-item:hover .logo-mark{border-color:var(--green);background:var(--green-bg)}
-    .logo-name{font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;color:var(--white) !important;letter-spacing:0.3px;white-space:nowrap}
+    .ticker-wrap{position:relative;z-index:10;background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border);height:72px;overflow:hidden;display:flex;justify-content:center}
+    .ticker-inner{width:100%;max-width:720px;overflow:hidden;position:relative}
+    .ticker-track{display:flex;flex-direction:column;animation:escalator 14s linear infinite}
+    .ticker-item{display:flex;align-items:center;gap:14px;padding:0 32px;height:72px;flex-shrink:0;font-family:'DM Mono',monospace;font-size:13px;color:var(--text);border-bottom:1px solid var(--border)}
+    .ticker-item:last-child{border-bottom:none}
+    .t-cat{color:var(--green);font-size:11px;letter-spacing:2px;font-weight:500;background:rgba(0,229,160,0.08);border:1px solid rgba(0,229,160,0.2);padding:2px 8px;border-radius:4px;white-space:nowrap}
+    .t-score{color:var(--amber);font-weight:500;margin-left:auto}
+    @keyframes escalator{
+      0%{transform:translateY(0)}
+      100%{transform:translateY(-50%)}
+    }
+    .logos-section{position:relative;z-index:10;padding:32px 64px;border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:var(--black)}
+    .logos-label{text-align:center;font-size:13px;color:var(--muted);margin-bottom:32px;font-weight:300;letter-spacing:0.5px}
+    .logos-row{display:flex;align-items:center;justify-content:center;gap:56px;flex-wrap:nowrap}
+    .logo-item{display:flex;flex-direction:row;align-items:center;gap:10px;flex-shrink:0;cursor:default}
+    .logo-mark{width:32px;height:32px;display:flex;align-items:center;justify-content:center;color:var(--green);flex-shrink:0}
+    .logo-name{font-family:'DM Sans',sans-serif;font-size:18px;font-weight:700;color:var(--white);letter-spacing:-0.3px;white-space:nowrap;text-shadow:0 0 20px rgba(0,229,160,0.6)}
     section{position:relative;z-index:10}
     .section-wrap{padding:112px 64px}
     .section-tag{display:inline-flex;align-items:center;gap:8px;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--green);margin-bottom:20px}
@@ -171,7 +174,50 @@
     .footer-links a{font-size:12px;color:var(--muted);text-decoration:none;transition:color 0.2s}
     .footer-links a:hover{color:var(--text)}
     .footer-right{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted)}
-    /* ── RESPONSIVE ── */
+    .contact-section{background:var(--deep);border-top:1px solid var(--border)}
+    /* TRY THE API */
+    .try-section{background:var(--deep);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+    .try-box{margin-top:40px;background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden}
+    .try-input-row{display:flex;gap:12px;padding:20px;align-items:center;border-bottom:1px solid var(--border);flex-wrap:wrap}
+    .try-input-wrap{flex:1;display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border2);border-radius:8px;padding:0 14px;min-width:220px}
+    .try-input-icon{font-size:14px;flex-shrink:0}
+    .try-input{flex:1;background:none;border:none;outline:none;font-family:'DM Mono',monospace;font-size:13px;color:var(--text);padding:12px 0}
+    .try-input::placeholder{color:var(--muted)}
+    .try-key{width:180px;background:var(--surface);border:1px solid var(--border2);border-radius:8px;padding:12px 14px;outline:none;font-family:'DM Mono',monospace;font-size:12px;color:var(--text)}
+    .try-key::placeholder{color:var(--muted)}
+    .try-btn{padding:12px 28px;background:var(--green);color:var(--black);font-size:14px;font-weight:700;border-radius:8px;border:none;cursor:pointer;transition:all 0.2s;white-space:nowrap;font-family:'DM Sans',sans-serif}
+    .try-btn:hover{background:var(--green-d);transform:translateY(-1px)}
+    .try-btn:disabled{opacity:0.5;cursor:not-allowed;transform:none}
+    .try-result{padding:20px}
+    .try-result-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+    .try-status{font-family:'DM Mono',monospace;font-size:12px;color:var(--green);background:rgba(0,229,160,0.08);border:1px solid rgba(0,229,160,0.2);padding:3px 10px;border-radius:4px}
+    .try-time{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted)}
+    .try-result-body{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    .try-signal{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px}
+    .try-signal-entity{font-size:15px;font-weight:600;color:var(--white);margin-bottom:4px}
+    .try-signal-event{font-size:12px;color:var(--muted2);margin-bottom:10px}
+    .try-signal-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+    .try-signal-label{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:1px}
+    .try-signal-val{font-family:'DM Mono',monospace;font-size:12px;color:var(--green)}
+    .try-summary{grid-column:1/-1;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px}
+    .try-summary-label{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:2px;margin-bottom:8px}
+    .try-summary-text{font-size:13px;color:var(--text);line-height:1.7}
+    .try-loading{display:flex;align-items:center;gap:10px;padding:24px 20px;font-family:'DM Mono',monospace;font-size:13px;color:var(--muted)}
+    .try-bar{height:3px;background:var(--border);border-radius:2px;margin-top:10px;overflow:hidden}
+    .try-bar-fill{height:100%;background:var(--green);border-radius:2px;transition:width 0.8s ease}
+    .try-code{font-family:'DM Mono',monospace;font-size:11px;color:var(--green);background:rgba(0,229,160,0.05);border:1px solid rgba(0,229,160,0.15);border-radius:6px;padding:10px 14px;margin-top:14px;white-space:pre}
+    .try-spinner{width:16px;height:16px;border:2px solid var(--border2);border-top-color:var(--green);border-radius:50%;animation:spin 0.7s linear infinite;flex-shrink:0}
+    .try-error{padding:16px 20px;font-family:'DM Mono',monospace;font-size:12px;color:#ff6b6b;background:rgba(255,107,107,0.06);border-top:1px solid rgba(255,107,107,0.15)}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .contact-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:48px}
+    .contact-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:32px;display:flex;flex-direction:column;gap:12px;transition:all 0.3s}
+    .contact-card:hover{border-color:var(--green);transform:translateY(-3px)}
+    .cc-icon{font-size:28px}
+    .cc-title{font-size:16px;font-weight:600;color:var(--white)}
+    .cc-desc{font-size:13px;color:var(--muted2);line-height:1.7;flex:1}
+    .cc-btn{font-family:'DM Mono',monospace;font-size:12px;color:var(--green);text-decoration:none;border:1px solid rgba(0,229,160,0.3);padding:8px 14px;border-radius:6px;display:inline-block;transition:all 0.2s;width:fit-content}
+    .cc-btn:hover{background:var(--green-bg);border-color:var(--green)}
+    /* contact mobile */
     @media(max-width:900px){
       nav{padding:0 20px}
       .nav-center{display:none}
@@ -179,6 +225,8 @@
       .hero{padding:100px 16px 60px}
       .hero-eyebrow{font-size:11px;padding:5px 12px 5px 8px}
       .eyebrow-text{white-space:normal;line-height:1.4}
+      .hero-cta{grid-template-columns:1fr 1fr;max-width:100%}
+      .btn-hp,.btn-hs{padding:14px 16px;font-size:13px}
       .hero-metrics{width:100%;flex-wrap:wrap}
       .metric{flex:1 1 45%;padding:16px 12px}
       .metric:nth-child(2){border-right:none}
@@ -190,19 +238,22 @@
       .demo-layout{grid-template-columns:1fr}
       .cases-grid{grid-template-columns:1fr}
       .api-grid{grid-template-columns:1fr}
+      .contact-grid{grid-template-columns:1fr}
+      .try-input-row{flex-direction:column;align-items:stretch}
+      .try-key{width:100%}
+      .try-result-body{grid-template-columns:1fr}
       .stats-banner{padding:40px 16px}
       .stats-inner{grid-template-columns:1fr 1fr;width:100%}
       .stat-cell:nth-child(2){border-right:none}
       .stat-cell:nth-child(3){border-top:1px solid var(--border)}
       .stat-cell:nth-child(4){border-top:1px solid var(--border);border-right:none}
-      .logos-row{gap:0;flex-direction:column;flex-wrap:nowrap}
-      .logo-item{border-right:none;border-bottom:1px solid var(--border);padding:16px 24px;width:100%;justify-content:center}
-      .logo-item:last-child{border-bottom:none}
-      .logos-section{padding:32px 16px}
+      .logos-row{gap:32px;flex-wrap:wrap;justify-content:center}
+      .logo-item{flex-direction:row;width:auto}
+      .logos-section{padding:40px 24px}
       footer{flex-direction:column;gap:20px;text-align:center;padding:32px 16px}
       .footer-links{flex-wrap:wrap;justify-content:center;gap:16px}
       .footer-right{display:none}
-      .ticker-item{padding:0 16px}
+      .ticker-item{padding:0 20px}
       .code-bdy pre{font-size:11px;white-space:pre-wrap;word-break:break-all}
       .cta-inner{padding:72px 16px}
     }
@@ -214,19 +265,19 @@
       .hero{padding:88px 16px 56px}
       .hero-title{font-size:34px;letter-spacing:-0.5px;line-height:1.1}
       .hero-sub{font-size:15px}
-      .hero-cta{flex-direction:column;width:100%}
-      .btn-hp,.btn-hs{width:100%;justify-content:center}
+      .hero-cta{grid-template-columns:1fr;max-width:100%}
       .hero-metrics{flex-direction:column;width:100%}
       .metric{width:100%;border-right:none !important;border-top:none !important;border-bottom:1px solid var(--border)}
       .metric:last-child{border-bottom:none}
       .section-wrap{padding:56px 16px}
       .section-title{font-size:26px}
       .arch-features{grid-template-columns:1fr}
+      .contact-grid{grid-template-columns:1fr}
       .stats-banner{padding:28px 16px}
       .stats-inner{grid-template-columns:1fr 1fr !important;width:100%}
       .stat-cell{padding:24px 12px}
-      .stat-cell:nth-child(1){border-right:1px solid var(--border) !important;border-bottom:none}
-      .stat-cell:nth-child(2){border-right:none !important;border-bottom:none}
+      .stat-cell:nth-child(1){border-right:1px solid var(--border) !important}
+      .stat-cell:nth-child(2){border-right:none !important}
       .stat-cell:nth-child(3){border-top:1px solid var(--border) !important;border-right:1px solid var(--border) !important}
       .stat-cell:nth-child(4){border-top:1px solid var(--border) !important;border-right:none !important}
       .stat-num{font-size:30px}
@@ -239,8 +290,6 @@
       .ep-desc{display:none}
       .code-bdy pre{font-size:11px;white-space:pre-wrap;word-break:break-all}
       footer{padding:24px 16px}
-      .btn-solid{padding:7px 14px;font-size:11px}
-      .nav-logo-text{font-size:13px}
     }
     @keyframes rise{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
     @keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(0,229,160,0.4)}50%{opacity:0.7;box-shadow:0 0 0 5px rgba(0,229,160,0)}}
@@ -282,6 +331,8 @@
   <div class="hero-cta">
     <a href="#demo" class="btn-hp"><span>▶</span> View Demo</a>
     <a href="https://project-ghost-production.up.railway.app" target="_blank" class="btn-hs">Developer Docs <span>↗</span></a>
+    <a href="#contact" class="btn-hs">Contact</a>
+    <a href="#architecture" class="btn-hs">Architecture</a>
   </div>
   <div class="hero-metrics">
     <div class="metric"><div class="metric-val"><span>3.5</span>s</div><div class="metric-label">Avg. response time</div></div>
@@ -292,7 +343,8 @@
 </section>
 
 <div class="ticker-wrap">
-  <div class="ticker-track">
+  <div class="ticker-inner">
+    <div class="ticker-track">
     <div class="ticker-item"><span class="t-cat">STARTUPS</span> AMI Labs raises $1.03B at $3.5B valuation <span class="t-score">▲ 9.2</span></div>
     <div class="ticker-item"><span class="t-cat">MARKETS</span> Oil climbs above $100 on OPEC supply cuts <span class="t-score">▲ 8.7</span></div>
     <div class="ticker-item"><span class="t-cat">AI</span> Google backs Nscale with $1B compute deal <span class="t-score">▲ 8.1</span></div>
@@ -308,10 +360,11 @@
     <div class="ticker-item"><span class="t-cat">MARKETS</span> DeepSeek rout wipes $600B from Nvidia cap <span class="t-score">▲ 9.8</span></div>
     <div class="ticker-item"><span class="t-cat">TECH</span> TfL breach exposed 10M customer records <span class="t-score">▲ 7.3</span></div>
   </div>
+  </div>
 </div>
 
 <div class="logos-section">
-  <p class="logos-label">Trusted by</p>
+  <p class="logos-label">Trusted by innovative companies</p>
   <div class="logos-row reveal">
     <div class="logo-item">
       <div class="logo-mark"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/><path d="M11 8v6M8 11h6"/></svg></div>
@@ -341,7 +394,7 @@
   <div class="section-wrap">
     <div class="reveal">
       <div class="section-tag">Architecture</div>
-      <h2 class="section-title">Distributed Web Intelligence Processing Model</h2>
+      <h2 class="section-title">How Project Ghost Works</h2>
       <p class="section-sub">A full intelligence pipeline — from raw web content to decision-ready signals — in a single API call.</p>
     </div>
     <div class="arch-grid reveal">
@@ -452,7 +505,35 @@
   </div>
 </section>
 
-<div class="stats-banner">
+<!-- TRY THE API -->
+<section class="try-section" id="try">
+  <div class="section-wrap">
+    <div class="reveal">
+      <div class="section-tag">Try It Live</div>
+      <h2 class="section-title">Try the API yourself.</h2>
+      <p class="section-sub">Enter any public URL and see Ghost extract structured signals in real time.</p>
+    </div>
+    <div class="try-box reveal">
+      <div class="try-input-row">
+        <div class="try-input-wrap">
+          <span class="try-input-icon">🌐</span>
+          <input class="try-input" id="tryUrl" type="url" placeholder="https://techcrunch.com" />
+        </div>
+        <button class="try-btn" id="tryBtn" onclick="runTry()">
+          <span id="tryBtnText">▶ Run</span>
+        </button>
+      </div>
+      <div class="try-result" id="tryResult" style="display:none">
+        <div class="try-result-hdr">
+          <span id="tryStatus" class="try-status"></span>
+          <span id="tryTime" class="try-time"></span>
+        </div>
+        <div class="try-result-body" id="tryBody"></div>
+      </div>
+      <div class="try-error" id="tryError" style="display:none"></div>
+    </div>
+  </div>
+</section>
   <div class="stats-inner reveal">
     <div class="stat-cell"><div class="stat-num"><em>3.5</em>s</div><div class="stat-lbl">Average response time</div></div>
     <div class="stat-cell"><div class="stat-num"><em>~50</em>%</div><div class="stat-lbl">Token reduction per request</div></div>
@@ -525,12 +606,43 @@ GET /search?<span class="tp">q</span>=<span class="ts">nvidia</span>&amp;<span c
   </div>
 </section>
 
+<section class="contact-section" id="contact">
+  <div class="section-wrap">
+    <div class="reveal">
+      <div class="section-tag">Contact</div>
+      <h2 class="section-title">Get in touch.</h2>
+      <p class="section-sub">Interested in API access, partnerships, or enterprise pricing? We'd love to hear from you.</p>
+    </div>
+    <div class="contact-grid reveal">
+      <div class="contact-card">
+        <div class="cc-icon">📬</div>
+        <div class="cc-title">API Access</div>
+        <div class="cc-desc">Request an API key and start integrating Ghost into your agent pipeline.</div>
+        <a href="mailto:hello@projectghost.ai" class="cc-btn">hello@projectghost.ai ↗</a>
+      </div>
+      <div class="contact-card">
+        <div class="cc-icon">🤝</div>
+        <div class="cc-title">Partnerships</div>
+        <div class="cc-desc">Building something that could benefit from real-time web intelligence? Let's talk.</div>
+        <a href="mailto:hello@projectghost.ai" class="cc-btn">Get in touch ↗</a>
+      </div>
+      <div class="contact-card">
+        <div class="cc-icon">💼</div>
+        <div class="cc-title">Enterprise</div>
+        <div class="cc-desc">Custom signal feeds, dedicated infrastructure, and SLA guarantees for teams.</div>
+        <a href="mailto:hello@projectghost.ai" class="cc-btn">Contact sales ↗</a>
+      </div>
+    </div>
+  </div>
+</section>
+
 <footer>
   <div class="footer-left"><div class="flogo">👻</div><span class="ftext">Project Ghost v2.0</span></div>
   <div class="footer-links">
     <a href="#architecture">Architecture</a>
     <a href="#demo">Demo</a>
     <a href="#api">API</a>
+    <a href="#contact">Contact</a>
     <a href="https://project-ghost-production.up.railway.app" target="_blank">Docs ↗</a>
     <a href="https://github.com/Sid890-cpu/project-ghost" target="_blank">GitHub ↗</a>
   </div>
@@ -538,7 +650,80 @@ GET /search?<span class="tp">q</span>=<span class="ts">nvidia</span>&amp;<span c
 </footer>
 
 <script>
-  // Custom cursor
+  async function runTry() {
+    const url = document.getElementById('tryUrl').value.trim() || 'https://techcrunch.com';
+    const btn = document.getElementById('tryBtn');
+    const btnText = document.getElementById('tryBtnText');
+    const resultBox = document.getElementById('tryResult');
+    const errorBox = document.getElementById('tryError');
+    const body = document.getElementById('tryBody');
+
+    btn.disabled = true;
+    btnText.textContent = '⏳ Distilling...';
+    resultBox.style.display = 'none';
+    errorBox.style.display = 'none';
+    body.innerHTML = `<div class="try-loading"><div class="try-spinner"></div> Extracting signals from ${url}...</div>`;
+    resultBox.style.display = 'block';
+
+    const t0 = Date.now();
+    try {
+      const res = await fetch('https://project-ghost-production.up.railway.app/distill', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url })
+      });
+      const elapsed = ((Date.now() - t0) / 1000).toFixed(2) + 's';
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.detail || data.error || `Error ${res.status}`);
+
+      document.getElementById('tryStatus').textContent = `✓ ${res.status} OK`;
+      document.getElementById('tryTime').textContent = `${elapsed} · ${(JSON.stringify(data).length / 1024).toFixed(1)}KB`;
+
+      const signals = data.signals || data.entities || [];
+      const summary = data.summary || data.summaries?.[0] || '';
+      let html = '';
+
+      if (signals.length) {
+        signals.slice(0, 3).forEach(s => {
+          const conf = s.confidence ?? s.score ?? 0;
+          const pct = Math.round(conf * 100);
+          html += `<div class="try-signal">
+            <div class="try-signal-entity">${s.entity || s.name || 'Signal'}</div>
+            <div class="try-signal-event">${s.event || s.description || ''}</div>
+            <div class="try-signal-row"><span class="try-signal-label">CONFIDENCE</span><span class="try-signal-val">${conf}</span></div>
+            <div class="try-signal-row"><span class="try-signal-label">IMPACT</span><span class="try-signal-val">${s.impact ?? s.impact_score ?? '—'}</span></div>
+            <div class="try-signal-row"><span class="try-signal-label">CATEGORY</span><span class="try-signal-val">${s.category || '—'}</span></div>
+            <div class="try-bar"><div class="try-bar-fill" style="width:${pct}%"></div></div>
+          </div>`;
+        });
+      } else {
+        // Fallback: show raw JSON prettily
+        html = `<div class="try-signal" style="grid-column:1/-1"><pre style="font-size:11px;color:var(--text);white-space:pre-wrap;word-break:break-all;margin:0">${JSON.stringify(data, null, 2).slice(0, 1000)}</pre></div>`;
+      }
+
+      if (summary) {
+        const sumText = typeof summary === 'string' ? summary : summary.text || JSON.stringify(summary);
+        const avgConf = signals.length ? (signals.reduce((a,s)=>a+(s.confidence??0),0)/signals.length).toFixed(2) : '—';
+        html += `<div class="try-summary">
+          <div class="try-summary-label">SUMMARY →</div>
+          <div class="try-summary-text">${sumText}</div>
+          <div class="try-code">// Agent-ready output
+{ signals: ${signals.length}, avg_confidence: ${avgConf}, tokens_saved: "${data.tokens_saved || '~51%'}" }</div>
+        </div>`;
+      }
+
+      body.innerHTML = html;
+
+    } catch(e) {
+      resultBox.style.display = 'none';
+      errorBox.style.display = 'block';
+      errorBox.textContent = `⚠ ${e.message}`;
+    } finally {
+      btn.disabled = false;
+      btnText.textContent = '▶ Run';
+    }
+  }
+
   const cur = document.getElementById('cursor');
   const ring = document.getElementById('cursorRing');
   let mx=0,my=0,rx=0,ry=0;
