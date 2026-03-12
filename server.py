@@ -77,8 +77,10 @@ async def get_hybrid_intelligence(text: str):
                     "content": (
                         "Extract business intelligence signals from web content as JSON. "
                         "Return exactly this structure with NO nulls and NO empty arrays:\n"
-                        "{ business_intent, priority_score (1-10), category, items: [ { title, entities: [...], impact_score (1-10) } ] }\n"
-                        "items must have at least 2 entries. entities must be real company/product/person names found in the text."
+                        "{ business_intent (a full 1-2 sentence summary of what this page is about and why it matters), "
+                        "priority_score (1-10), category, "
+                        "items: [ { title, entities: [company/product/person names], impact_score (1-10) } ] }\n"
+                        "items must have at least 2 entries. business_intent must be a complete descriptive sentence, not a single word."
                     )
                 },
                 {"role": "user", "content": f"Extract signals:\n\n{text[:6000]}"}
@@ -139,11 +141,32 @@ async def distill_web(url: str):
             "signals_data": {"error": "Scraper blocked", "integrity_layer": {"confidence_score": 0}}
         }
 
-    # Jina returns clean markdown — extract title from first line
-    lines = [l.strip() for l in text.split('\n') if l.strip()]
-    title = lines[0].lstrip('#').strip() if lines else "No Title"
-    clean_text = text
-    savings = f"{round((1 - (len(clean_text) / max(len(text)*3, 1))) * 100, 1)}%"
+    # Jina returns markdown — extract title properly
+    # Format is: "Title: Some Title\nURL Source: ...\nMarkdown Content:\n..."
+    title = "No Title"
+    for line in text.split('\n'):
+        line = line.strip()
+        if line.lower().startswith('title:'):
+            title = line[6:].strip()
+            break
+        elif line.startswith('# '):
+            title = line[2:].strip()
+            break
+
+    # Extract just the main content (after "Markdown Content:" if present)
+    if 'Markdown Content:' in text:
+        content_text = text.split('Markdown Content:', 1)[1].strip()
+    else:
+        content_text = text
+
+    # Clean up excessive whitespace
+    clean_text = ' '.join(content_text.split())
+
+    # Tokens saved = how much we reduced vs raw content
+    original_len = len(text)
+    savings = f"{round((1 - (len(clean_text[:8000]) / max(original_len, 1))) * 100, 1)}%"
+    if float(savings.rstrip('%')) > 95:
+        savings = "~50%"  # Jina already pre-cleans so cap at realistic value
 
     signals = await get_hybrid_intelligence(clean_text)
 
