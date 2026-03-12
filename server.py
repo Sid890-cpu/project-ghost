@@ -186,12 +186,11 @@ async def distill_web(url: str):
     # Clean up excessive whitespace
     clean_text = ' '.join(content_text.split())
 
-    # Real tokens saved: original page chars vs what we send to AI (6000 chars)
-    # Average webpage is ~50,000-200,000 chars of HTML; Jina strips to clean text
-    original_html_estimate = len(text) * 4  # Jina already compressed ~4x from raw HTML
+    # Tokens saved = raw Jina response (before content extraction) vs what we send to Groq
+    # This is the honest number: full page text Jina fetched vs 6000 chars we process
+    raw_jina_len = len(text)  # full Jina response including headers/metadata
     sent_to_ai = min(len(clean_text), 6000)
-    raw_savings = 1 - (sent_to_ai / max(original_html_estimate, 1))
-    savings = f"{round(max(min(raw_savings * 100, 97), 40), 1)}%"  # clamp 40-97%
+    savings = f"{round((1 - sent_to_ai / max(raw_jina_len, 1)) * 100, 1)}%"
 
     # Detect robot/captcha pages — return blocked instead of processing junk
     robot_signals = ["are you a robot", "captcha", "verify you are human", "unusual activity", "access denied", "enable javascript"]
