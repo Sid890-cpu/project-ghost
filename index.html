@@ -729,10 +729,6 @@ GET /search?<span class="tp">q</span>=<span class="ts">nvidia</span>&amp;<span c
           <div class="try-badge">${decision.category || 'GENERAL'} · ${decision.priority_score || '—'}/10</div>
         </div>
         <div class="try-summary-inline">${summaryText}</div>
-        ${allEntities.length ? `<div class="try-entities-row">
-          <span class="try-ent-label">ENTITIES</span>
-          <div class="try-ent-list">${allEntities.map(e => `<span class="try-ent-tag">${e}</span>`).join('')}</div>
-        </div>` : ''}
         <div class="try-meta-row">
           <div class="try-meta-item"><span class="try-signal-label">CONFIDENCE</span><span class="try-signal-val">${confidence}</span></div>
           <div class="try-meta-item"><span class="try-signal-label">TOKENS SAVED</span><span class="try-signal-val">${tokensSaved}</span></div>
