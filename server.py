@@ -184,6 +184,10 @@ async def distill_web(url: str):
 
     signals = await get_hybrid_intelligence(clean_text)
 
+    # Debug: log first 300 chars to see Jina format
+    import sys
+    print(f"JINA_FIRST_300: {repr(text[:300])}", file=sys.stderr)
+
     payload = {
         "url": url,
         "title": title[:200],
