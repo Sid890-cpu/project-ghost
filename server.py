@@ -41,6 +41,17 @@ async def fetch_url(url: str) -> tuple[str, str]:
         if not text or len(text.strip()) < 100:
             return "", "empty response"
 
+        # Detect robot/captcha pages — check first 1500 chars
+        first_chunk = text[:1500].lower()
+        bot_signals = [
+            "are you a robot", "are you human", "captcha", "unusual activity",
+            "verify you are human", "cf-browser-verification", "access denied",
+            "robot?", "please verify", "security check", "not a robot",
+            "detected unusual", "suspicious activity"
+        ]
+        if any(b in first_chunk for b in bot_signals):
+            return "", "blocked"
+
         return text, ""
     except Exception as e:
         return "", str(e)
@@ -182,11 +193,16 @@ async def distill_web(url: str):
     raw_savings = 1 - (sent_to_ai / max(original_html_estimate, 1))
     savings = f"{round(max(min(raw_savings * 100, 97), 40), 1)}%"  # clamp 40-97%
 
-    signals = await get_hybrid_intelligence(clean_text)
+    # Detect robot/captcha pages — return blocked instead of processing junk
+    robot_signals = ["are you a robot", "captcha", "verify you are human", "unusual activity", "access denied", "enable javascript"]
+    if any(s in title.lower() for s in robot_signals) or any(s in clean_text[:500].lower() for s in robot_signals):
+        return {
+            "url": url,
+            "title": "Blocked",
+            "signals_data": {"error": "Scraper blocked", "integrity_layer": {"confidence_score": 0}}
+        }
 
-    # Debug: log first 300 chars to see Jina format
-    import sys
-    print(f"JINA_FIRST_300: {repr(text[:300])}", file=sys.stderr)
+    signals = await get_hybrid_intelligence(clean_text)
 
     payload = {
         "url": url,
