@@ -203,6 +203,12 @@
     .try-summary-label{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:2px;margin-bottom:8px}
     .try-summary-text{font-size:13px;color:var(--text);line-height:1.7}
     .try-loading{display:flex;align-items:center;gap:10px;padding:24px 20px;font-family:'DM Mono',monospace;font-size:13px;color:var(--muted)}
+    .try-blocked{grid-column:1/-1;text-align:center;padding:32px 20px}
+    .try-blocked-icon{font-size:36px;margin-bottom:12px}
+    .try-blocked-title{font-size:15px;font-weight:600;color:var(--white);margin-bottom:8px}
+    .try-blocked-msg{font-size:13px;color:var(--muted2);line-height:1.7}
+    .try-sugg{color:var(--green);cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+    .try-sugg:hover{opacity:0.8}
     .try-bar{height:3px;background:var(--border);border-radius:2px;margin-top:10px;overflow:hidden}
     .try-bar-fill{height:100%;background:var(--green);border-radius:2px;transition:width 0.8s ease}
     .try-code{font-family:'DM Mono',monospace;font-size:11px;color:var(--green);background:rgba(0,229,160,0.05);border:1px solid rgba(0,229,160,0.15);border-radius:6px;padding:10px 14px;margin-top:14px;white-space:pre}
@@ -679,38 +685,65 @@ GET /search?<span class="tp">q</span>=<span class="ts">nvidia</span>&amp;<span c
       document.getElementById('tryStatus').textContent = `✓ ${res.status} OK`;
       document.getElementById('tryTime').textContent = `${elapsed} · ${(JSON.stringify(data).length / 1024).toFixed(1)}KB`;
 
-      const signals = data.signals || data.entities || [];
-      const summary = data.summary || data.summaries?.[0] || '';
+      // Check if site was blocked
+      const sd = data.signals_data || {};
+      if (sd.error === 'Scraper blocked' || data.title === 'Blocked') {
+        body.innerHTML = `<div class="try-blocked">
+          <div class="try-blocked-icon">🚫</div>
+          <div class="try-blocked-title">Site blocked our scraper</div>
+          <div class="try-blocked-msg">This site (${new URL(url).hostname}) uses anti-bot protection. Try a news site like <span class="try-sugg" onclick="document.getElementById('tryUrl').value='https://techcrunch.com'">techcrunch.com</span>, <span class="try-sugg" onclick="document.getElementById('tryUrl').value='https://reuters.com'">reuters.com</span>, or <span class="try-sugg" onclick="document.getElementById('tryUrl').value='https://theverge.com'">theverge.com</span></div>
+        </div>`;
+        return;
+      }
+
+      // Extract signals from response
+      const decision = sd.decision_signal || {};
+      const items = sd.items || [];
+      const integrity = sd.integrity_layer || {};
+      const confidence = integrity.confidence_score || 0;
+      const title = data.title || '';
+      const content = data.content || '';
+      const tokensSaved = data.tokens_saved || '—';
+
       let html = '';
 
-      if (signals.length) {
-        signals.slice(0, 3).forEach(s => {
-          const conf = s.confidence ?? s.score ?? 0;
-          const pct = Math.round(conf * 100);
-          html += `<div class="try-signal">
-            <div class="try-signal-entity">${s.entity || s.name || 'Signal'}</div>
-            <div class="try-signal-event">${s.event || s.description || ''}</div>
-            <div class="try-signal-row"><span class="try-signal-label">CONFIDENCE</span><span class="try-signal-val">${conf}</span></div>
-            <div class="try-signal-row"><span class="try-signal-label">IMPACT</span><span class="try-signal-val">${s.impact ?? s.impact_score ?? '—'}</span></div>
-            <div class="try-signal-row"><span class="try-signal-label">CATEGORY</span><span class="try-signal-val">${s.category || '—'}</span></div>
-            <div class="try-bar"><div class="try-bar-fill" style="width:${pct}%"></div></div>
-          </div>`;
-        });
-      } else {
-        // Fallback: show raw JSON prettily
-        html = `<div class="try-signal" style="grid-column:1/-1"><pre style="font-size:11px;color:var(--text);white-space:pre-wrap;word-break:break-all;margin:0">${JSON.stringify(data, null, 2).slice(0, 1000)}</pre></div>`;
-      }
-
-      if (summary) {
-        const sumText = typeof summary === 'string' ? summary : summary.text || JSON.stringify(summary);
-        const avgConf = signals.length ? (signals.reduce((a,s)=>a+(s.confidence??0),0)/signals.length).toFixed(2) : '—';
-        html += `<div class="try-summary">
-          <div class="try-summary-label">SUMMARY →</div>
-          <div class="try-summary-text">${sumText}</div>
-          <div class="try-code">// Agent-ready output
-{ signals: ${signals.length}, avg_confidence: ${avgConf}, tokens_saved: "${data.tokens_saved || '~51%'}" }</div>
+      // Decision signal card (main signal)
+      if (decision.business_intent) {
+        html += `<div class="try-signal" style="grid-column:1/-1;border-color:rgba(0,229,160,0.3)">
+          <div class="try-signal-entity">🧠 ${decision.category || 'SIGNAL'}</div>
+          <div class="try-signal-event" style="font-size:14px;color:var(--text);margin-bottom:12px">${decision.business_intent}</div>
+          <div class="try-signal-row"><span class="try-signal-label">PRIORITY SCORE</span><span class="try-signal-val">${decision.priority_score || '—'} / 10</span></div>
+          <div class="try-signal-row"><span class="try-signal-label">CONFIDENCE</span><span class="try-signal-val">${confidence}</span></div>
+          <div class="try-signal-row"><span class="try-signal-label">TOKENS SAVED</span><span class="try-signal-val">${tokensSaved}</span></div>
+          <div class="try-bar"><div class="try-bar-fill" style="width:${Math.round(confidence*100)}%"></div></div>
         </div>`;
       }
+
+      // Individual items
+      items.slice(0, 4).forEach(item => {
+        const entities = (item.entities || []).join(', ') || '—';
+        html += `<div class="try-signal">
+          <div class="try-signal-entity">${item.title || 'Signal'}</div>
+          <div class="try-signal-event">${entities}</div>
+          <div class="try-signal-row"><span class="try-signal-label">IMPACT</span><span class="try-signal-val">${item.impact_score || '—'} / 10</span></div>
+          <div class="try-signal-row"><span class="try-signal-label">PUBLISHED</span><span class="try-signal-val">${(item.published_time||'').slice(0,10)||'—'}</span></div>
+        </div>`;
+      });
+
+      // If no structured data, show page title + content snippet
+      if (!decision.business_intent && items.length === 0) {
+        html = `<div class="try-signal" style="grid-column:1/-1">
+          <div class="try-signal-entity">📄 ${title}</div>
+          <div class="try-signal-event" style="color:var(--muted2);font-size:13px;line-height:1.6;margin-top:8px">${content.slice(0, 300)}...</div>
+          <div class="try-signal-row" style="margin-top:12px"><span class="try-signal-label">TOKENS SAVED</span><span class="try-signal-val">${tokensSaved}</span></div>
+        </div>`;
+      }
+
+      // Code snippet
+      html += `<div class="try-summary" style="grid-column:1/-1">
+        <div class="try-summary-label">AGENT-READY OUTPUT →</div>
+        <div class="try-code">{ url: "${url}", confidence: ${confidence}, tokens_saved: "${tokensSaved}", items: ${items.length} }</div>
+      </div>`;
 
       body.innerHTML = html;
 
