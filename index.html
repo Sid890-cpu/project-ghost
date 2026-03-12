@@ -203,7 +203,17 @@
     .try-summary-label{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:2px;margin-bottom:8px}
     .try-summary-text{font-size:13px;color:var(--text);line-height:1.7}
     .try-loading{display:flex;align-items:center;gap:10px;padding:24px 20px;font-family:'DM Mono',monospace;font-size:13px;color:var(--muted)}
-    .try-blocked{grid-column:1/-1;text-align:center;padding:32px 20px}
+    .try-main-card{grid-column:1/-1;background:var(--surface);border:1px solid rgba(0,229,160,0.2);border-radius:12px;padding:20px;display:flex;flex-direction:column;gap:14px}
+    .try-main-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap}
+    .try-page-title{font-size:16px;font-weight:700;color:var(--white)}
+    .try-badge{font-family:'DM Mono',monospace;font-size:11px;color:var(--green);background:rgba(0,229,160,0.08);border:1px solid rgba(0,229,160,0.2);padding:3px 10px;border-radius:4px;white-space:nowrap}
+    .try-summary-inline{font-size:13px;color:var(--muted2);line-height:1.7}
+    .try-entities-row{display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap}
+    .try-ent-label{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:1.5px;padding-top:4px;white-space:nowrap}
+    .try-ent-list{display:flex;flex-wrap:wrap;gap:6px}
+    .try-ent-tag{font-size:12px;font-weight:500;color:var(--white);background:var(--card);border:1px solid var(--border2);border-radius:6px;padding:3px 10px}
+    .try-meta-row{display:flex;gap:24px;flex-wrap:wrap}
+    .try-meta-item{display:flex;flex-direction:column;gap:3px}
     .try-blocked-icon{font-size:36px;margin-bottom:12px}
     .try-blocked-title{font-size:15px;font-weight:600;color:var(--white);margin-bottom:8px}
     .try-blocked-msg{font-size:13px;color:var(--muted2);line-height:1.7}
@@ -691,58 +701,48 @@ GET /search?<span class="tp">q</span>=<span class="ts">nvidia</span>&amp;<span c
         body.innerHTML = `<div class="try-blocked">
           <div class="try-blocked-icon">🚫</div>
           <div class="try-blocked-title">Site blocked our scraper</div>
-          <div class="try-blocked-msg">This site (${new URL(url).hostname}) uses anti-bot protection. Try a news site like <span class="try-sugg" onclick="document.getElementById('tryUrl').value='https://techcrunch.com'">techcrunch.com</span>, <span class="try-sugg" onclick="document.getElementById('tryUrl').value='https://reuters.com'">reuters.com</span>, or <span class="try-sugg" onclick="document.getElementById('tryUrl').value='https://theverge.com'">theverge.com</span></div>
+          <div class="try-blocked-msg">${new URL(url).hostname} uses Cloudflare or paywall protection. Try: <span class="try-sugg" onclick="document.getElementById('tryUrl').value='https://apple.com';runTry()">apple.com</span>, <span class="try-sugg" onclick="document.getElementById('tryUrl').value='https://github.com/trending';runTry()">github.com/trending</span>, or <span class="try-sugg" onclick="document.getElementById('tryUrl').value='https://news.ycombinator.com';runTry()">news.ycombinator.com</span></div>
         </div>`;
         return;
       }
 
-      // Extract signals from response
+      // Extract from response
       const decision = sd.decision_signal || {};
       const items = sd.items || [];
       const integrity = sd.integrity_layer || {};
       const confidence = integrity.confidence_score || 0;
-      const title = data.title || '';
-      const content = data.content || '';
       const tokensSaved = data.tokens_saved || '—';
+      const pageTitle = data.title || '';
+      const content = data.content || '';
 
-      let html = '';
+      // Collect ALL entities from all items into one flat list
+      const allEntities = [...new Set(items.flatMap(i => i.entities || []))].slice(0, 10);
 
-      // Decision signal card (main signal)
-      if (decision.business_intent) {
-        html += `<div class="try-signal" style="grid-column:1/-1;border-color:rgba(0,229,160,0.3)">
-          <div class="try-signal-entity">🧠 ${decision.category || 'SIGNAL'}</div>
-          <div class="try-signal-event" style="font-size:14px;color:var(--text);margin-bottom:12px">${decision.business_intent}</div>
-          <div class="try-signal-row"><span class="try-signal-label">PRIORITY SCORE</span><span class="try-signal-val">${decision.priority_score || '—'} / 10</span></div>
-          <div class="try-signal-row"><span class="try-signal-label">CONFIDENCE</span><span class="try-signal-val">${confidence}</span></div>
-          <div class="try-signal-row"><span class="try-signal-label">TOKENS SAVED</span><span class="try-signal-val">${tokensSaved}</span></div>
-          <div class="try-bar"><div class="try-bar-fill" style="width:${Math.round(confidence*100)}%"></div></div>
-        </div>`;
-      }
+      // Build a short summary from business_intent + content
+      const summaryText = decision.business_intent
+        ? decision.business_intent
+        : content.slice(0, 180) + '...';
 
-      // Individual items
-      items.slice(0, 4).forEach(item => {
-        const entities = (item.entities || []).join(', ') || '—';
-        html += `<div class="try-signal">
-          <div class="try-signal-entity">${item.title || 'Signal'}</div>
-          <div class="try-signal-event">${entities}</div>
-          <div class="try-signal-row"><span class="try-signal-label">IMPACT</span><span class="try-signal-val">${item.impact_score || '—'} / 10</span></div>
-          <div class="try-signal-row"><span class="try-signal-label">PUBLISHED</span><span class="try-signal-val">${(item.published_time||'').slice(0,10)||'—'}</span></div>
-        </div>`;
-      });
-
-      // If no structured data, show page title + content snippet
-      if (!decision.business_intent && items.length === 0) {
-        html = `<div class="try-signal" style="grid-column:1/-1">
-          <div class="try-signal-entity">📄 ${title}</div>
-          <div class="try-signal-event" style="color:var(--muted2);font-size:13px;line-height:1.6;margin-top:8px">${content.slice(0, 300)}...</div>
-          <div class="try-signal-row" style="margin-top:12px"><span class="try-signal-label">TOKENS SAVED</span><span class="try-signal-val">${tokensSaved}</span></div>
-        </div>`;
-      }
-
-      // Code snippet
-      html += `<div class="try-summary" style="grid-column:1/-1">
+      let html = `<div class="try-main-card">
+        <div class="try-main-top">
+          <div class="try-page-title">📄 ${pageTitle}</div>
+          <div class="try-badge">${decision.category || 'GENERAL'} · ${decision.priority_score || '—'}/10</div>
+        </div>
+        <div class="try-summary-inline">${summaryText}</div>
+        ${allEntities.length ? `<div class="try-entities-row">
+          <span class="try-ent-label">ENTITIES</span>
+          <div class="try-ent-list">${allEntities.map(e => `<span class="try-ent-tag">${e}</span>`).join('')}</div>
+        </div>` : ''}
+        <div class="try-meta-row">
+          <div class="try-meta-item"><span class="try-signal-label">CONFIDENCE</span><span class="try-signal-val">${confidence}</span></div>
+          <div class="try-meta-item"><span class="try-signal-label">TOKENS SAVED</span><span class="try-signal-val">${tokensSaved}</span></div>
+          <div class="try-meta-item"><span class="try-signal-label">SIGNALS</span><span class="try-signal-val">${items.length}</span></div>
+        </div>
+        <div class="try-bar"><div class="try-bar-fill" style="width:${Math.round(confidence*100)}%"></div></div>
+      </div>
+      <div class="try-summary" style="grid-column:1/-1">
         <div class="try-summary-label">AGENT-READY OUTPUT →</div>
-        <div class="try-code">{ url: "${url}", confidence: ${confidence}, tokens_saved: "${tokensSaved}", items: ${items.length} }</div>
+        <div class="try-code">{ url: "${url}", confidence: ${confidence}, tokens_saved: "${tokensSaved}", entities: ${JSON.stringify(allEntities.slice(0,5))} }</div>
       </div>`;
 
       body.innerHTML = html;
