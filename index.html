@@ -250,6 +250,14 @@
     .cf-status{font-size:13px;text-align:center;min-height:18px;font-family:'DM Mono',monospace}
     .cf-status.success{color:var(--green)}
     .cf-status.error{color:#ff6b6b}
+    .plan-selector{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:4px}
+    .plan-opt{border:1px solid var(--border2);border-radius:10px;padding:12px 10px;cursor:pointer;transition:all 0.2s;text-align:center;background:var(--surface)}
+    .plan-opt:hover{border-color:rgba(0,229,160,0.4);background:rgba(0,229,160,0.04)}
+    .plan-opt.selected{border-color:var(--green);background:rgba(0,229,160,0.08)}
+    .plan-opt-name{font-size:13px;font-weight:700;color:var(--white);margin-bottom:4px}
+    .plan-opt-detail{font-size:11px;color:var(--muted);font-family:'DM Mono',monospace}
+    .plan-opt.selected .plan-opt-name{color:var(--green)}
+    @media(max-width:480px){.plan-selector{grid-template-columns:1fr}}
     .cc-icon{font-size:28px}
     .cc-title{font-size:16px;font-weight:600;color:var(--white)}
     .cc-desc{font-size:13px;color:var(--muted2);line-height:1.7;flex:1}
@@ -679,15 +687,15 @@ GET /search?<span class="tp">q</span>=<span class="ts">nvidia</span>&amp;<span c
 <section class="contact-section" id="contact">
   <div class="section-wrap">
     <div class="reveal">
-      <div class="section-tag">Contact</div>
-      <h2 class="section-title">Get in touch.</h2>
-      <p class="section-sub">Interested in API access, partnerships, or enterprise pricing? We'd love to hear from you.</p>
+      <div class="section-tag">Get Access</div>
+      <h2 class="section-title">Request your API key.</h2>
+      <p class="section-sub">Fill in your details and choose a plan. We'll email your <code style="color:var(--green);background:rgba(0,229,160,0.08);padding:2px 7px;border-radius:4px;font-size:13px">ghost_sk_...</code> key within 24 hours.</p>
     </div>
 
     <div class="contact-form-wrap reveal">
       <div class="contact-form-box">
-        <div class="cf-title">Send us a message</div>
-        <div class="cf-subtitle">We typically respond within 24 hours.</div>
+        <div class="cf-title">Request API Access</div>
+        <div class="cf-subtitle">Free plan includes 100 requests/month. No credit card needed.</div>
         <div class="cf-field">
           <label class="cf-label">Your Name</label>
           <input type="text" id="cf-name" class="cf-input" placeholder="John Smith" />
@@ -697,10 +705,28 @@ GET /search?<span class="tp">q</span>=<span class="ts">nvidia</span>&amp;<span c
           <input type="email" id="cf-email" class="cf-input" placeholder="john@company.com" />
         </div>
         <div class="cf-field">
-          <label class="cf-label">Message</label>
-          <textarea id="cf-message" class="cf-input cf-textarea" placeholder="Tell us what you're building..."></textarea>
+          <label class="cf-label">Choose Plan</label>
+          <div class="plan-selector" id="plan-selector">
+            <div class="plan-opt selected" onclick="selectPlan(this,'free')">
+              <div class="plan-opt-name">Free</div>
+              <div class="plan-opt-detail">100 req/mo · No cost</div>
+            </div>
+            <div class="plan-opt" onclick="selectPlan(this,'developer')">
+              <div class="plan-opt-name">Developer</div>
+              <div class="plan-opt-detail">2,000 req/mo · ₹499/mo</div>
+            </div>
+            <div class="plan-opt" onclick="selectPlan(this,'startup')">
+              <div class="plan-opt-name">Startup</div>
+              <div class="plan-opt-detail">10,000 req/mo · ₹1,999/mo</div>
+            </div>
+          </div>
+          <input type="hidden" id="cf-plan" value="free" />
         </div>
-        <button class="cf-btn" onclick="sendContactForm()">Send Message →</button>
+        <div class="cf-field">
+          <label class="cf-label">What are you building?</label>
+          <textarea id="cf-message" class="cf-input cf-textarea" placeholder="e.g. A travel agent that compares flight prices, a research tool for my startup..."></textarea>
+        </div>
+        <button class="cf-btn" onclick="sendContactForm()">Request API Key →</button>
         <div id="cf-status" class="cf-status"></div>
         <div class="contact-direct">
           <span class="contact-direct-label">Or email us directly →</span>
@@ -724,7 +750,7 @@ GET /search?<span class="tp">q</span>=<span class="ts">nvidia</span>&amp;<span c
   <div class="footer-right">Web Intelligence Infrastructure for AI Agents</div>
 </footer>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
   async function runTry() {
     const url = document.getElementById('tryUrl').value.trim() || 'https://apple.com';
     const btn = document.getElementById('tryBtn');
@@ -849,10 +875,17 @@ GET /search?<span class="tp">q</span>=<span class="ts">nvidia</span>&amp;<span c
   // EmailJS init
   emailjs.init('UMQ-tfr_9iVu8Ck0D');
 
+  function selectPlan(el, plan) {
+    document.querySelectorAll('.plan-opt').forEach(o => o.classList.remove('selected'));
+    el.classList.add('selected');
+    document.getElementById('cf-plan').value = plan;
+  }
+
   function sendContactForm() {
     const name = document.getElementById('cf-name').value.trim();
     const email = document.getElementById('cf-email').value.trim();
     const message = document.getElementById('cf-message').value.trim();
+    const plan = document.getElementById('cf-plan').value;
     const status = document.getElementById('cf-status');
     const btn = document.querySelector('.cf-btn');
 
@@ -868,31 +901,20 @@ GET /search?<span class="tp">q</span>=<span class="ts">nvidia</span>&amp;<span c
     }
 
     btn.disabled = true;
-    btn.textContent = 'Sending...';
+    btn.textContent = 'Sending request...';
     status.textContent = '';
     status.className = 'cf-status';
 
     emailjs.send('service_6s1n7t4', 'template_dyzzftu', {
       from_name: name,
       from_email: email,
-      message: message,
+      message: `[API KEY REQUEST]\nPlan: ${plan.toUpperCase()}\nWhat they're building: ${message}`,
     })
     .then(() => {
-      status.textContent = '✓ Message sent! We\'ll get back to you within 24 hours.';
+      status.textContent = '✓ Request received! Your ghost_sk_ key will arrive within 24 hours.';
       status.className = 'cf-status success';
       document.getElementById('cf-name').value = '';
       document.getElementById('cf-email').value = '';
       document.getElementById('cf-message').value = '';
-      btn.textContent = 'Send Message →';
+      btn.textContent = 'Request API Key →';
       btn.disabled = false;
-    })
-    .catch((err) => {
-      status.textContent = '✗ Failed to send. Please email us directly.';
-      status.className = 'cf-status error';
-      btn.textContent = 'Send Message →';
-      btn.disabled = false;
-    });
-  }
-</script>
-</body>
-</html>
