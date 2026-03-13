@@ -236,8 +236,78 @@ if __name__ == "__main__":
     async def http_health(request: Request):
         return JSONResponse({"status": "ok", "version": "2.0"})
 
+    async def http_root(request: Request):
+        from starlette.responses import HTMLResponse
+        html = """<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Project Ghost API</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#020305;color:#e2e8f0;font-family:'DM Mono',monospace;padding:48px 24px;max-width:720px;margin:0 auto}
+  h1{font-size:28px;font-weight:700;color:#fff;margin-bottom:8px}
+  .tag{color:#00e5a0;font-size:12px;letter-spacing:2px;margin-bottom:24px;display:block}
+  p{color:#94a3b8;line-height:1.7;margin-bottom:32px;font-family:sans-serif;font-size:15px}
+  .endpoint{background:#0d1117;border:1px solid #1e293b;border-radius:8px;padding:20px;margin-bottom:16px}
+  .method{display:inline-block;padding:3px 10px;border-radius:4px;font-size:12px;font-weight:700;margin-right:10px}
+  .post{background:rgba(0,229,160,0.15);color:#00e5a0}
+  .get{background:rgba(59,130,246,0.15);color:#60a5fa}
+  .mcp{background:rgba(168,85,247,0.15);color:#c084fc}
+  .path{font-size:14px;color:#fff}
+  .desc{font-size:13px;color:#64748b;margin-top:8px;font-family:sans-serif}
+  .example{background:#0d1117;border:1px solid #1e293b;border-radius:8px;padding:20px;margin-top:32px}
+  .example h3{color:#fff;font-size:14px;margin-bottom:12px}
+  pre{font-size:12px;color:#00e5a0;line-height:1.8;overflow-x:auto}
+  .badge{display:inline-block;background:rgba(0,229,160,0.1);border:1px solid rgba(0,229,160,0.2);color:#00e5a0;padding:4px 12px;border-radius:4px;font-size:12px;margin-bottom:32px}
+  a{color:#00e5a0;text-decoration:none}
+</style>
+</head>
+<body>
+  <span class="tag">PROJECT GHOST API v2.0</span>
+  <h1>Web Reading Layer<br>for AI Agents</h1>
+  <br>
+  <span class="badge">● Live & Production Ready</span>
+  <p>Convert any public URL into structured, agent-ready data in one API call. No SDK required — works with any language that can make an HTTP request.</p>
+
+  <div class="endpoint">
+    <span class="method post">POST</span><span class="path">/distill</span>
+    <div class="desc">Any URL → structured signals, entities, summary. The core endpoint.</div>
+  </div>
+  <div class="endpoint">
+    <span class="method get">GET</span><span class="path">/health</span>
+    <div class="desc">Liveness check. Returns status and version.</div>
+  </div>
+  <div class="endpoint">
+    <span class="method get">GET</span><span class="path">/feed?limit=20</span>
+    <div class="desc">Poll cached signals from the intelligence database.</div>
+  </div>
+  <div class="endpoint">
+    <span class="method get">GET</span><span class="path">/search?q=nvidia</span>
+    <div class="desc">Search processed signals by entity name.</div>
+  </div>
+  <div class="endpoint">
+    <span class="method mcp">MCP</span><span class="path">/mcp</span>
+    <div class="desc">Native MCP endpoint. Plug into Cursor, Claude, or any MCP agent.</div>
+  </div>
+
+  <div class="example">
+    <h3>Quick Start</h3>
+    <pre>curl -X POST https://project-ghost-production.up.railway.app/distill \\
+  -H "Content-Type: application/json" \\
+  -d '{"url": "https://apple.com"}'</pre>
+  </div>
+
+  <br><br>
+  <p style="font-size:13px">Built by Project Ghost · <a href="https://project-ghost-lilac.vercel.app">Landing Page</a> · <a href="mailto:ProjectGhost__@outlook.com">Contact</a></p>
+</body>
+</html>"""
+        return HTMLResponse(html)
+
     mcp_app = mcp.http_app()
     app = Starlette(routes=[
+        Route("/", http_root, methods=["GET"]),
         Route("/distill", http_distill, methods=["POST"]),
         Route("/health", http_health, methods=["GET"]),
         Mount("/", app=mcp_app),
