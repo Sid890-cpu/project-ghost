@@ -243,64 +243,281 @@ if __name__ == "__main__":
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Project Ghost API</title>
+<title>Project Ghost API Docs</title>
 <style>
-  *{margin:0;padding:0;box-sizing:border-box}
-  body{background:#020305;color:#e2e8f0;font-family:'DM Mono',monospace;padding:48px 24px;max-width:720px;margin:0 auto}
-  h1{font-size:28px;font-weight:700;color:#fff;margin-bottom:8px}
-  .tag{color:#00e5a0;font-size:12px;letter-spacing:2px;margin-bottom:24px;display:block}
-  p{color:#94a3b8;line-height:1.7;margin-bottom:32px;font-family:sans-serif;font-size:15px}
-  .endpoint{background:#0d1117;border:1px solid #1e293b;border-radius:8px;padding:20px;margin-bottom:16px}
-  .method{display:inline-block;padding:3px 10px;border-radius:4px;font-size:12px;font-weight:700;margin-right:10px}
-  .post{background:rgba(0,229,160,0.15);color:#00e5a0}
-  .get{background:rgba(59,130,246,0.15);color:#60a5fa}
-  .mcp{background:rgba(168,85,247,0.15);color:#c084fc}
-  .path{font-size:14px;color:#fff}
-  .desc{font-size:13px;color:#64748b;margin-top:8px;font-family:sans-serif}
-  .example{background:#0d1117;border:1px solid #1e293b;border-radius:8px;padding:20px;margin-top:32px}
-  .example h3{color:#fff;font-size:14px;margin-bottom:12px}
-  pre{font-size:12px;color:#00e5a0;line-height:1.8;overflow-x:auto}
-  .badge{display:inline-block;background:rgba(0,229,160,0.1);border:1px solid rgba(0,229,160,0.2);color:#00e5a0;padding:4px 12px;border-radius:4px;font-size:12px;margin-bottom:32px}
-  a{color:#00e5a0;text-decoration:none}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0a0e1a;color:#e2e8f0;font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh}
+.top-bar{background:#020305;border-bottom:2px solid #00e5a0;padding:16px 32px;display:flex;align-items:center;gap:16px;position:sticky;top:0;z-index:100}
+.top-logo{font-size:20px;font-weight:800;color:#fff;letter-spacing:-0.5px}
+.top-logo span{color:#00e5a0}
+.top-version{background:rgba(0,229,160,0.1);border:1px solid rgba(0,229,160,0.3);color:#00e5a0;font-size:11px;padding:3px 10px;border-radius:20px;font-family:monospace}
+.top-live{display:flex;align-items:center;gap:6px;margin-left:auto;font-size:12px;color:#00e5a0}
+.live-dot{width:8px;height:8px;background:#00e5a0;border-radius:50%;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+.layout{display:grid;grid-template-columns:260px 1fr;min-height:calc(100vh - 57px)}
+.sidebar{background:#020305;border-right:1px solid #1e293b;padding:24px 0;position:sticky;top:57px;height:calc(100vh - 57px);overflow-y:auto}
+.sidebar-section{padding:8px 20px;font-size:10px;color:#475569;letter-spacing:2px;text-transform:uppercase;margin-top:16px}
+.sidebar-item{display:block;padding:10px 20px;font-size:13px;color:#94a3b8;text-decoration:none;border-left:3px solid transparent;transition:all 0.2s;cursor:pointer}
+.sidebar-item:hover,.sidebar-item.active{color:#fff;background:rgba(0,229,160,0.05);border-left-color:#00e5a0}
+.sidebar-method{display:inline-block;font-size:10px;font-weight:700;padding:2px 6px;border-radius:3px;margin-right:8px;font-family:monospace}
+.sm-post{background:rgba(0,229,160,0.15);color:#00e5a0}
+.sm-get{background:rgba(59,130,246,0.15);color:#60a5fa}
+.sm-mcp{background:rgba(168,85,247,0.15);color:#c084fc}
+.main{padding:40px 48px;max-width:900px}
+.api-hero{margin-bottom:48px;padding-bottom:32px;border-bottom:1px solid #1e293b}
+.api-hero h1{font-size:32px;font-weight:800;color:#fff;margin-bottom:8px}
+.api-hero p{color:#64748b;font-size:15px;line-height:1.7;max-width:600px;margin-top:12px}
+.base-url{background:#020305;border:1px solid #1e293b;border-radius:8px;padding:14px 20px;margin-top:20px;font-family:monospace;font-size:13px;color:#00e5a0;display:flex;align-items:center;gap:10px}
+.base-url-label{color:#475569;font-size:11px;letter-spacing:1px}
+.endpoint-block{margin-bottom:32px;border:1px solid #1e293b;border-radius:12px;overflow:hidden}
+.endpoint-header{padding:20px 24px;display:flex;align-items:center;gap:16px;cursor:pointer;background:#0d1320;transition:background 0.2s}
+.endpoint-header:hover{background:#111827}
+.method-badge{padding:5px 14px;border-radius:6px;font-size:12px;font-weight:800;font-family:monospace;letter-spacing:0.5px;min-width:70px;text-align:center}
+.badge-post{background:rgba(0,229,160,0.15);color:#00e5a0;border:1px solid rgba(0,229,160,0.3)}
+.badge-get{background:rgba(59,130,246,0.15);color:#60a5fa;border:1px solid rgba(59,130,246,0.3)}
+.badge-mcp{background:rgba(168,85,247,0.15);color:#c084fc;border:1px solid rgba(168,85,247,0.3)}
+.endpoint-path{font-family:monospace;font-size:16px;font-weight:600;color:#fff}
+.endpoint-summary{font-size:13px;color:#64748b;margin-left:auto}
+.endpoint-chevron{color:#475569;font-size:12px;transition:transform 0.3s;margin-left:8px}
+.endpoint-body{display:none;border-top:1px solid #1e293b}
+.endpoint-body.open{display:block}
+.ep-section{padding:24px;border-bottom:1px solid #0f172a}
+.ep-section:last-child{border-bottom:none}
+.ep-label{font-size:11px;color:#475569;letter-spacing:2px;text-transform:uppercase;margin-bottom:12px}
+.ep-desc{font-size:14px;color:#94a3b8;line-height:1.7}
+.param-row{display:grid;grid-template-columns:140px 80px 1fr;gap:16px;padding:10px 0;border-bottom:1px solid #0f172a;align-items:start}
+.param-row:last-child{border-bottom:none}
+.param-name{font-family:monospace;font-size:13px;color:#fff}
+.param-type{font-family:monospace;font-size:11px;color:#f59e0b;background:rgba(245,158,11,0.1);padding:2px 8px;border-radius:4px;width:fit-content}
+.param-req{font-size:10px;color:#ef4444;background:rgba(239,68,68,0.1);padding:1px 6px;border-radius:3px;margin-left:6px}
+.param-desc{font-size:13px;color:#64748b}
+.code-block{background:#020305;border-radius:8px;overflow:hidden;margin-top:8px}
+.code-tabs{display:flex;border-bottom:1px solid #1e293b}
+.code-tab{padding:8px 16px;font-size:12px;color:#64748b;cursor:pointer;border-bottom:2px solid transparent;transition:all 0.2s}
+.code-tab.active{color:#00e5a0;border-bottom-color:#00e5a0}
+.code-content{padding:20px;font-family:monospace;font-size:12px;line-height:1.8;overflow-x:auto}
+.code-content .key{color:#60a5fa}
+.code-content .str{color:#00e5a0}
+.code-content .num{color:#f59e0b}
+.code-content .comment{color:#475569}
+.response-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(0,229,160,0.05);border:1px solid rgba(0,229,160,0.2);padding:6px 14px;border-radius:6px;margin-bottom:12px}
+.r-code{font-family:monospace;font-size:13px;color:#00e5a0;font-weight:700}
+.r-desc{font-size:12px;color:#64748b}
+.section-title{font-size:22px;font-weight:700;color:#fff;margin-bottom:8px;margin-top:48px;padding-top:48px;border-top:1px solid #1e293b}
+.section-sub{font-size:14px;color:#64748b;margin-bottom:24px}
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:32px}
+.info-card{background:#0d1320;border:1px solid #1e293b;border-radius:10px;padding:20px}
+.info-card-title{font-size:12px;color:#475569;letter-spacing:1px;margin-bottom:8px;text-transform:uppercase}
+.info-card-val{font-size:20px;font-weight:700;color:#00e5a0;font-family:monospace}
+.info-card-sub{font-size:12px;color:#64748b;margin-top:4px}
+@media(max-width:768px){.layout{grid-template-columns:1fr}.sidebar{display:none}.main{padding:24px 20px}}
 </style>
 </head>
 <body>
-  <span class="tag">PROJECT GHOST API v2.0</span>
-  <h1>Web Reading Layer<br>for AI Agents</h1>
-  <br>
-  <span class="badge">● Live & Production Ready</span>
-  <p>Convert any public URL into structured, agent-ready data in one API call. No SDK required — works with any language that can make an HTTP request.</p>
+<div class="top-bar">
+  <div class="top-logo">Project<span>Ghost</span></div>
+  <span class="top-version">v2.0</span>
+  <div class="top-live"><div class="live-dot"></div> API Live</div>
+</div>
+<div class="layout">
+  <div class="sidebar">
+    <div class="sidebar-section">Overview</div>
+    <a class="sidebar-item active" onclick="scrollTo('overview')">Introduction</a>
+    <a class="sidebar-item" onclick="scrollTo('quickstart')">Quick Start</a>
+    <div class="sidebar-section">Endpoints</div>
+    <a class="sidebar-item" onclick="scrollTo('distill')"><span class="sidebar-method sm-post">POST</span>/distill</a>
+    <a class="sidebar-item" onclick="scrollTo('health')"><span class="sidebar-method sm-get">GET</span>/health</a>
+    <a class="sidebar-item" onclick="scrollTo('feed')"><span class="sidebar-method sm-get">GET</span>/feed</a>
+    <a class="sidebar-item" onclick="scrollTo('search')"><span class="sidebar-method sm-get">GET</span>/search</a>
+    <a class="sidebar-item" onclick="scrollTo('mcp')"><span class="sidebar-method sm-mcp">MCP</span>/mcp</a>
+    <div class="sidebar-section">Resources</div>
+    <a class="sidebar-item" href="https://project-ghost-lilac.vercel.app" target="_blank">Landing Page ↗</a>
+    <a class="sidebar-item" href="mailto:ProjectGhost__@outlook.com">Contact</a>
+  </div>
+  <div class="main">
+    <div class="api-hero" id="overview">
+      <h1>Project Ghost API</h1>
+      <p>The web reading layer for AI agents. Convert any public URL into structured, agent-ready data — entities, signals, summaries — in a single API call.</p>
+      <div class="base-url">
+        <span class="base-url-label">BASE URL</span>
+        https://project-ghost-production.up.railway.app
+      </div>
+    </div>
 
-  <div class="endpoint">
-    <span class="method post">POST</span><span class="path">/distill</span>
-    <div class="desc">Any URL → structured signals, entities, summary. The core endpoint.</div>
-  </div>
-  <div class="endpoint">
-    <span class="method get">GET</span><span class="path">/health</span>
-    <div class="desc">Liveness check. Returns status and version.</div>
-  </div>
-  <div class="endpoint">
-    <span class="method get">GET</span><span class="path">/feed?limit=20</span>
-    <div class="desc">Poll cached signals from the intelligence database.</div>
-  </div>
-  <div class="endpoint">
-    <span class="method get">GET</span><span class="path">/search?q=nvidia</span>
-    <div class="desc">Search processed signals by entity name.</div>
-  </div>
-  <div class="endpoint">
-    <span class="method mcp">MCP</span><span class="path">/mcp</span>
-    <div class="desc">Native MCP endpoint. Plug into Cursor, Claude, or any MCP agent.</div>
-  </div>
+    <div class="info-grid">
+      <div class="info-card"><div class="info-card-title">Auth Required</div><div class="info-card-val">None</div><div class="info-card-sub">Open API — no key needed</div></div>
+      <div class="info-card"><div class="info-card-title">Response Format</div><div class="info-card-val">JSON</div><div class="info-card-sub">All endpoints return JSON</div></div>
+      <div class="info-card"><div class="info-card-title">Avg Response Time</div><div class="info-card-val">~7s</div><div class="info-card-sub">Including AI processing</div></div>
+      <div class="info-card"><div class="info-card-title">MCP Support</div><div class="info-card-val">Native</div><div class="info-card-sub">Works with Cursor & Claude</div></div>
+    </div>
 
-  <div class="example">
-    <h3>Quick Start</h3>
-    <pre>curl -X POST https://project-ghost-production.up.railway.app/distill \\
-  -H "Content-Type: application/json" \\
-  -d '{"url": "https://apple.com"}'</pre>
-  </div>
+    <div class="section-title" id="quickstart">Quick Start</div>
+    <div class="section-sub">Make your first API call in 30 seconds.</div>
+    <div class="code-block">
+      <div class="code-tabs"><div class="code-tab active">cURL</div><div class="code-tab">Python</div><div class="code-tab">JavaScript</div></div>
+      <div class="code-content"><span class="comment"># Extract structured data from any URL</span>
+curl -X POST https://project-ghost-production.up.railway.app/distill \
+  -H <span class="str">"Content-Type: application/json"</span> \
+  -d <span class="str">'{"url": "https://apple.com"}'</span></div>
+    </div>
 
-  <br><br>
-  <p style="font-size:13px">Built by Project Ghost · <a href="https://project-ghost-lilac.vercel.app">Landing Page</a> · <a href="mailto:ProjectGhost__@outlook.com">Contact</a></p>
+    <div class="section-title">Endpoints</div>
+
+    <div class="endpoint-block" id="distill">
+      <div class="endpoint-header" onclick="toggle(this)">
+        <span class="method-badge badge-post">POST</span>
+        <span class="endpoint-path">/distill</span>
+        <span class="endpoint-summary">Any URL → structured agent data</span>
+        <span class="endpoint-chevron">▼</span>
+      </div>
+      <div class="endpoint-body open">
+        <div class="ep-section">
+          <div class="ep-label">Description</div>
+          <div class="ep-desc">The core endpoint. Pass any public URL and receive structured intelligence — title, summary, entities, signals, confidence score, and tokens saved. Powers all agent use cases.</div>
+        </div>
+        <div class="ep-section">
+          <div class="ep-label">Request Body</div>
+          <div class="param-row"><span class="param-name">url <span class="param-req">required</span></span><span class="param-type">string</span><span class="param-desc">Any publicly accessible URL. Example: https://apple.com</span></div>
+        </div>
+        <div class="ep-section">
+          <div class="ep-label">Example Request</div>
+          <div class="code-block"><div class="code-content"><span class="comment">POST /distill</span>
+{
+  <span class="key">"url"</span>: <span class="str">"https://apple.com"</span>
+}</div></div>
+        </div>
+        <div class="ep-section">
+          <div class="ep-label">Example Response</div>
+          <div class="response-badge"><span class="r-code">200</span><span class="r-desc">OK</span></div>
+          <div class="code-block"><div class="code-content">{
+  <span class="key">"url"</span>: <span class="str">"https://apple.com"</span>,
+  <span class="key">"title"</span>: <span class="str">"Apple"</span>,
+  <span class="key">"content"</span>: <span class="str">"Apple MacBook Neo Amazing Mac..."</span>,
+  <span class="key">"tokens_saved"</span>: <span class="str">"91.2%"</span>,
+  <span class="key">"signals_data"</span>: {
+    <span class="key">"decision_signal"</span>: {
+      <span class="key">"business_intent"</span>: <span class="str">"Apple promotes its latest hardware lineup..."</span>,
+      <span class="key">"priority_score"</span>: <span class="num">8</span>,
+      <span class="key">"category"</span>: <span class="str">"Technology"</span>
+    },
+    <span class="key">"items"</span>: [
+      {
+        <span class="key">"title"</span>: <span class="str">"MacBook Pro with M5"</span>,
+        <span class="key">"entities"</span>: [<span class="str">"Apple"</span>, <span class="str">"MacBook"</span>, <span class="str">"M5"</span>],
+        <span class="key">"impact_score"</span>: <span class="num">9</span>
+      }
+    ],
+    <span class="key">"integrity_layer"</span>: {
+      <span class="key">"confidence_score"</span>: <span class="num">0.87</span>,
+      <span class="key">"is_high_integrity"</span>: <span class="num">true</span>
+    }
+  },
+  <span class="key">"created_at"</span>: <span class="str">"2026-03-13T10:00:00Z"</span>
+}</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="endpoint-block" id="health">
+      <div class="endpoint-header" onclick="toggle(this)">
+        <span class="method-badge badge-get">GET</span>
+        <span class="endpoint-path">/health</span>
+        <span class="endpoint-summary">Liveness check</span>
+        <span class="endpoint-chevron">▼</span>
+      </div>
+      <div class="endpoint-body">
+        <div class="ep-section"><div class="ep-label">Description</div><div class="ep-desc">Returns API status and current version. Use this to verify the service is running before making distill calls.</div></div>
+        <div class="ep-section">
+          <div class="ep-label">Example Response</div>
+          <div class="response-badge"><span class="r-code">200</span><span class="r-desc">OK</span></div>
+          <div class="code-block"><div class="code-content">{
+  <span class="key">"status"</span>: <span class="str">"ok"</span>,
+  <span class="key">"version"</span>: <span class="str">"2.0"</span>
+}</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="endpoint-block" id="feed">
+      <div class="endpoint-header" onclick="toggle(this)">
+        <span class="method-badge badge-get">GET</span>
+        <span class="endpoint-path">/feed</span>
+        <span class="endpoint-summary">Poll cached intelligence signals</span>
+        <span class="endpoint-chevron">▼</span>
+      </div>
+      <div class="endpoint-body">
+        <div class="ep-section"><div class="ep-label">Description</div><div class="ep-desc">Returns previously processed signals from the Ghost intelligence database. Use this to poll for cached results without re-processing URLs.</div></div>
+        <div class="ep-section">
+          <div class="ep-label">Query Parameters</div>
+          <div class="param-row"><span class="param-name">limit</span><span class="param-type">integer</span><span class="param-desc">Number of results to return. Default: 20, Max: 100</span></div>
+          <div class="param-row"><span class="param-name">min_confidence</span><span class="param-type">float</span><span class="param-desc">Filter by minimum confidence score (0.0 - 1.0). Default: 0.5</span></div>
+        </div>
+        <div class="ep-section">
+          <div class="ep-label">Example Request</div>
+          <div class="code-block"><div class="code-content">GET /feed?limit=10&min_confidence=0.7</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="endpoint-block" id="search">
+      <div class="endpoint-header" onclick="toggle(this)">
+        <span class="method-badge badge-get">GET</span>
+        <span class="endpoint-path">/search</span>
+        <span class="endpoint-summary">Search signals by entity name</span>
+        <span class="endpoint-chevron">▼</span>
+      </div>
+      <div class="endpoint-body">
+        <div class="ep-section"><div class="ep-label">Description</div><div class="ep-desc">Search the Ghost intelligence database by entity name. Returns all signals where the entity appears — companies, people, products.</div></div>
+        <div class="ep-section">
+          <div class="ep-label">Query Parameters</div>
+          <div class="param-row"><span class="param-name">q <span class="param-req">required</span></span><span class="param-type">string</span><span class="param-desc">Entity name to search for. Example: nvidia, apple, elon musk</span></div>
+          <div class="param-row"><span class="param-name">limit</span><span class="param-type">integer</span><span class="param-desc">Number of results. Default: 10</span></div>
+        </div>
+        <div class="ep-section">
+          <div class="ep-label">Example Request</div>
+          <div class="code-block"><div class="code-content">GET /search?q=apple&limit=5</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="endpoint-block" id="mcp">
+      <div class="endpoint-header" onclick="toggle(this)">
+        <span class="method-badge badge-mcp">MCP</span>
+        <span class="endpoint-path">/mcp</span>
+        <span class="endpoint-summary">Native MCP agent integration</span>
+        <span class="endpoint-chevron">▼</span>
+      </div>
+      <div class="endpoint-body">
+        <div class="ep-section"><div class="ep-label">Description</div><div class="ep-desc">Native Model Context Protocol endpoint. Plug Ghost directly into Cursor, Claude Desktop, or any MCP-compatible agent framework as a tool.</div></div>
+        <div class="ep-section">
+          <div class="ep-label">MCP Config (Claude Desktop / Cursor)</div>
+          <div class="code-block"><div class="code-content">{
+  <span class="key">"mcpServers"</span>: {
+    <span class="key">"project-ghost"</span>: {
+      <span class="key">"url"</span>: <span class="str">"https://project-ghost-production.up.railway.app/mcp"</span>,
+      <span class="key">"transport"</span>: <span class="str">"http"</span>
+    }
+  }
+}</div></div>
+        </div>
+      </div>
+    </div>
+
+    <br><br>
+    <p style="font-size:13px;color:#475569;padding-bottom:48px">Project Ghost v2.0 · <a href="https://project-ghost-lilac.vercel.app" style="color:#00e5a0">Landing Page</a> · <a href="mailto:ProjectGhost__@outlook.com" style="color:#00e5a0">Contact</a></p>
+  </div>
+</div>
+<script>
+function toggle(header) {
+  const body = header.nextElementSibling;
+  const chevron = header.querySelector('.endpoint-chevron');
+  body.classList.toggle('open');
+  chevron.style.transform = body.classList.contains('open') ? 'rotate(180deg)' : '';
+}
+function scrollTo(id) {
+  document.getElementById(id)?.scrollIntoView({behavior:'smooth'});
+}
+</script>
 </body>
 </html>"""
         return HTMLResponse(html)
