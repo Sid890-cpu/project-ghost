@@ -19,6 +19,73 @@ groq_client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
 def get_supabase():
     return create_client(os.environ.get("SUPABASE_URL"), os.environ.get("SUPABASE_ANON_KEY"))
 
+import secrets, hashlib
+
+PLAN_LIMITS = {
+    "free":      100,
+    "developer": 2000,
+    "startup":   10000,
+    "unlimited": 999999,
+}
+
+def generate_api_key() -> str:
+    """Generate a new ghost_sk_ prefixed API key."""
+    return "ghost_sk_" + secrets.token_urlsafe(32)
+
+def hash_key(key: str) -> str:
+    return hashlib.sha256(key.encode()).hexdigest()
+
+async def validate_api_key(request: Request):
+    """Check Authorization header. Returns (is_valid, error_response, key_row)"""
+    master_key = os.environ.get("GHOST_API_KEY", "")
+    auth_header = request.headers.get("Authorization", "")
+    provided_key = auth_header.replace("Bearer ", "").strip()
+
+    if not provided_key:
+        return False, JSONResponse(
+            {"error": "API key required", "hint": "Add header: Authorization: Bearer ghost_sk_..."},
+            status_code=401
+        ), None
+
+    if master_key and provided_key == master_key:
+        return True, None, {"plan": "unlimited", "requests_used": 0, "id": "master"}
+
+    try:
+        sb = get_supabase()
+        key_hash = hash_key(provided_key)
+        result = sb.table("api_keys").select("*").eq("key_hash", key_hash).eq("is_active", True).execute()
+
+        if not result.data:
+            return False, JSONResponse({"error": "Invalid or inactive API key"}, status_code=401), None
+
+        row = result.data[0]
+        plan = row.get("plan", "free")
+        limit = PLAN_LIMITS.get(plan, 100)
+        used = row.get("requests_used", 0)
+
+        if used >= limit:
+            return False, JSONResponse(
+                {"error": "Rate limit exceeded", "plan": plan, "limit": limit, "used": used,
+                 "hint": "Upgrade at https://project-ghost-lilac.vercel.app"},
+                status_code=429
+            ), None
+
+        return True, None, row
+
+    except Exception as e:
+        print(f"[API KEY CHECK ERROR] {e}")
+        return True, None, {"plan": "free", "requests_used": 0, "id": "unknown"}
+
+async def increment_usage(key_id: str):
+    if key_id == "master":
+        return
+    try:
+        sb = get_supabase()
+        sb.rpc("increment_key_usage", {"key_id": key_id}).execute()
+    except Exception as e:
+        print(f"[USAGE INCREMENT ERROR] {e}")
+
+
 async def fetch_url(url: str) -> tuple[str, str]:
     """Use Jina AI Reader to fetch any URL — bypasses Cloudflare and paywalls."""
     jina_url = f"https://r.jina.ai/{url}"
@@ -223,13 +290,53 @@ if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8080))
 
     async def http_distill(request: Request):
+        # Validate API key
+        is_valid, err_response, key_row = await validate_api_key(request)
+        if not is_valid:
+            return err_response
         try:
             body = await request.json()
             url = body.get("url")
             if not url:
                 return JSONResponse({"error": "url required"}, status_code=400)
             result = await distill_web(url)
+            # Track usage
+            await increment_usage(key_row.get("id", "unknown"))
+            # Add usage info to response
+            plan = key_row.get("plan", "free")
+            used = key_row.get("requests_used", 0) + 1
+            limit = PLAN_LIMITS.get(plan, 100)
+            result["_usage"] = {"plan": plan, "requests_used": used, "limit": limit, "remaining": limit - used}
             return JSONResponse(result)
+        except Exception as e:
+            return JSONResponse({"error": str(e)}, status_code=500)
+
+    async def http_generate_key(request: Request):
+        """Admin endpoint to generate API keys. Protected by master key."""
+        master_key = os.environ.get("GHOST_API_KEY", "")
+        auth = request.headers.get("Authorization", "").replace("Bearer ", "").strip()
+        if not master_key or auth != master_key:
+            return JSONResponse({"error": "Unauthorized"}, status_code=401)
+        try:
+            body = await request.json()
+            email = body.get("email", "unknown")
+            plan = body.get("plan", "free")
+            name = body.get("name", "")
+            new_key = generate_api_key()
+            key_hash = hash_key(new_key)
+            sb = get_supabase()
+            sb.table("api_keys").insert({
+                "key_hash": key_hash,
+                "email": email,
+                "name": name,
+                "plan": plan,
+                "is_active": True,
+                "requests_used": 0,
+                "created_at": datetime.utcnow().isoformat() + "Z"
+            }).execute()
+            return JSONResponse({"key": new_key, "email": email, "plan": plan,
+                                  "limit": PLAN_LIMITS.get(plan, 100),
+                                  "message": "Send this key to the developer. It won't be shown again."})
         except Exception as e:
             return JSONResponse({"error": str(e)}, status_code=500)
 
@@ -553,6 +660,7 @@ function scrollTo(id) {
     app = Starlette(routes=[
         Route("/", http_root, methods=["GET"]),
         Route("/distill", http_distill, methods=["POST"]),
+        Route("/generate-key", http_generate_key, methods=["POST"]),
         Route("/health", http_health, methods=["GET"]),
         Mount("/", app=mcp_app),
     ])
