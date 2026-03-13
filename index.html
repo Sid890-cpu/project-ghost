@@ -335,6 +335,7 @@
     .reveal{opacity:0;transform:translateY(28px);transition:opacity 0.7s ease,transform 0.7s ease}
     .reveal.in{opacity:1;transform:none}
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 </head>
 <body>
 <div class="bg-grid"></div>
@@ -808,6 +809,9 @@ GET /search?<span class="tp">q</span>=<span class="ts">nvidia</span>&amp;<span c
   }, {threshold:0.5});
   document.querySelectorAll('.res-card').forEach(el => barIO.observe(el));
 
+  // EmailJS init
+  emailjs.init('UMQ-tfr_9iVu8Ck0D');
+
   function sendContactForm() {
     const name = document.getElementById('cf-name').value.trim();
     const email = document.getElementById('cf-email').value.trim();
@@ -826,14 +830,31 @@ GET /search?<span class="tp">q</span>=<span class="ts">nvidia</span>&amp;<span c
       return;
     }
 
-    const subject = encodeURIComponent(`Project Ghost Inquiry from ${name}`);
-    const body = encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`);
-    window.location.href = `mailto:ProjectGhost__@outlook.com?subject=${subject}&body=${body}`;
-
     btn.disabled = true;
-    status.textContent = '✓ Opening your email client...';
-    status.className = 'cf-status success';
-    setTimeout(() => { btn.disabled = false; status.textContent = ''; }, 4000);
+    btn.textContent = 'Sending...';
+    status.textContent = '';
+    status.className = 'cf-status';
+
+    emailjs.send('service_6s1n7t4', 'uq6k8na', {
+      from_name: name,
+      from_email: email,
+      message: message,
+    })
+    .then(() => {
+      status.textContent = '✓ Message sent! We\'ll get back to you within 24 hours.';
+      status.className = 'cf-status success';
+      document.getElementById('cf-name').value = '';
+      document.getElementById('cf-email').value = '';
+      document.getElementById('cf-message').value = '';
+      btn.textContent = 'Send Message →';
+      btn.disabled = false;
+    })
+    .catch((err) => {
+      status.textContent = '✗ Failed to send. Please email us directly.';
+      status.className = 'cf-status error';
+      btn.textContent = 'Send Message →';
+      btn.disabled = false;
+    });
   }
 </script>
 </body>
