@@ -310,7 +310,25 @@ body{background:#0a0e1a;color:#e2e8f0;font-family:'Segoe UI',system-ui,sans-seri
 .info-card-title{font-size:12px;color:#475569;letter-spacing:1px;margin-bottom:8px;text-transform:uppercase}
 .info-card-val{font-size:20px;font-weight:700;color:#00e5a0;font-family:monospace}
 .info-card-sub{font-size:12px;color:#64748b;margin-top:4px}
-@media(max-width:768px){.layout{grid-template-columns:1fr}.sidebar{display:none}.main{padding:24px 20px}}
+@media(max-width:768px){
+  .layout{grid-template-columns:1fr}
+  .sidebar{display:none}
+  .main{padding:20px 16px}
+  .api-hero h1{font-size:24px}
+  .info-grid{grid-template-columns:1fr 1fr}
+  .endpoint-header{flex-wrap:wrap;gap:10px}
+  .endpoint-summary{display:none}
+  .endpoint-path{font-size:14px}
+  .param-row{grid-template-columns:1fr;gap:4px}
+  .code-content{font-size:11px;padding:14px}
+  .section-title{font-size:18px;padding-top:32px;margin-top:32px}
+  .top-bar{padding:12px 16px}
+  .mobile-nav{display:flex}
+}
+.mobile-nav{display:none;overflow-x:auto;gap:8px;padding:12px 16px;background:#020305;border-bottom:1px solid #1e293b;scrollbar-width:none}
+.mobile-nav::-webkit-scrollbar{display:none}
+.mobile-nav-item{flex-shrink:0;display:flex;align-items:center;gap:6px;padding:6px 14px;border:1px solid #1e293b;border-radius:20px;font-size:12px;color:#94a3b8;cursor:pointer;white-space:nowrap;transition:all 0.2s}
+.mobile-nav-item:hover{border-color:#00e5a0;color:#fff}
 </style>
 </head>
 <body>
@@ -320,6 +338,15 @@ body{background:#0a0e1a;color:#e2e8f0;font-family:'Segoe UI',system-ui,sans-seri
   <div class="top-live"><div class="live-dot"></div> API Live</div>
 </div>
 <div class="layout">
+  <div class="mobile-nav">
+    <div class="mobile-nav-item" onclick="scrollTo('overview')">Intro</div>
+    <div class="mobile-nav-item" onclick="scrollTo('quickstart')">Quick Start</div>
+    <div class="mobile-nav-item" onclick="scrollTo('distill')"><span class="sidebar-method sm-post">POST</span>/distill</div>
+    <div class="mobile-nav-item" onclick="scrollTo('health')"><span class="sidebar-method sm-get">GET</span>/health</div>
+    <div class="mobile-nav-item" onclick="scrollTo('feed')"><span class="sidebar-method sm-get">GET</span>/feed</div>
+    <div class="mobile-nav-item" onclick="scrollTo('search')"><span class="sidebar-method sm-get">GET</span>/search</div>
+    <div class="mobile-nav-item" onclick="scrollTo('mcp')"><span class="sidebar-method sm-mcp">MCP</span>/mcp</div>
+  </div>
   <div class="sidebar">
     <div class="sidebar-section">Overview</div>
     <a class="sidebar-item active" onclick="scrollTo('overview')">Introduction</a>
