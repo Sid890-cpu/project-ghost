@@ -917,4 +917,14 @@ GET /search?<span class="tp">q</span>=<span class="ts">nvidia</span>&amp;<span c
       document.getElementById('cf-email').value = '';
       document.getElementById('cf-message').value = '';
       btn.textContent = 'Request API Key →';
+      btn.disabled = false;    })
+    .catch((err) => {
+      status.textContent = '✗ Something went wrong. Email us directly.';
+      status.className = 'cf-status error';
+      btn.textContent = 'Request API Key →';
       btn.disabled = false;
+    });
+  }
+</script>
+</body>
+</html>
