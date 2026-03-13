@@ -479,7 +479,7 @@
   -H <span class="ts">"Content-Type: application/json"</span> \
   -H <span class="ts">"Authorization: Bearer API_KEY"</span> \
   -d <span class="ts">'{
-    "url": "https://techcrunch.com"
+    "url": "https://apple.com"
   }'</span></pre></div>
         </div>
         <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin:20px 0 12px;font-family:'DM Mono',monospace">MCP Integration</div>
@@ -554,7 +554,7 @@
       <div class="try-input-row">
         <div class="try-input-wrap">
           <span class="try-input-icon">🌐</span>
-          <input class="try-input" id="tryUrl" type="url" placeholder="https://techcrunch.com" />
+          <input class="try-input" id="tryUrl" type="url" placeholder="https://apple.com" />
         </div>
         <button class="try-btn" id="tryBtn" onclick="runTry()">
           <span id="tryBtnText">▶ Run</span>
@@ -693,7 +693,7 @@ GET /search?<span class="tp">q</span>=<span class="ts">nvidia</span>&amp;<span c
 
 <script>
   async function runTry() {
-    const url = document.getElementById('tryUrl').value.trim() || 'https://techcrunch.com';
+    const url = document.getElementById('tryUrl').value.trim() || 'https://apple.com';
     const btn = document.getElementById('tryBtn');
     const btnText = document.getElementById('tryBtnText');
     const resultBox = document.getElementById('tryResult');
@@ -727,7 +727,7 @@ GET /search?<span class="tp">q</span>=<span class="ts">nvidia</span>&amp;<span c
         body.innerHTML = `<div class="try-blocked">
           <div class="try-blocked-icon">🚫</div>
           <div class="try-blocked-title">Site blocked our scraper</div>
-          <div class="try-blocked-msg">${new URL(url).hostname} has aggressive bot protection that blocks even advanced scrapers. Try: <span class="try-sugg" onclick="document.getElementById('tryUrl').value='https://apple.com';runTry()">apple.com</span>, <span class="try-sugg" onclick="document.getElementById('tryUrl').value='https://github.com/trending';runTry()">github.com/trending</span>, or <span class="try-sugg" onclick="document.getElementById('tryUrl').value='https://news.ycombinator.com';runTry()">news.ycombinator.com</span></div>
+          <div class="try-blocked-msg">${new URL(url).hostname} uses Cloudflare or paywall protection that blocks scrapers. Try: <span class="try-sugg" onclick="document.getElementById('tryUrl').value='https://apple.com';runTry()">apple.com</span>, <span class="try-sugg" onclick="document.getElementById('tryUrl').value='https://github.com/trending';runTry()">github.com/trending</span>, or <span class="try-sugg" onclick="document.getElementById('tryUrl').value='https://news.ycombinator.com';runTry()">news.ycombinator.com</span></div>
         </div>`;
         return;
       }
