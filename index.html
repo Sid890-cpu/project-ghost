@@ -33,6 +33,7 @@
     .cursor{width:8px;height:8px;background:var(--green);border-radius:50%;position:fixed;pointer-events:none;z-index:9999;mix-blend-mode:screen;transform:translate(-50%,-50%)}
     .cursor-ring{width:32px;height:32px;border:1px solid rgba(0,229,160,0.35);border-radius:50%;position:fixed;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:width 0.2s,height 0.2s,border-color 0.2s}
     body:has(a:hover) .cursor-ring,body:has(button:hover) .cursor-ring{width:48px;height:48px;border-color:rgba(0,229,160,0.6)}
+    @media(hover:none),(pointer:coarse){.cursor,.cursor-ring{display:none}body{cursor:auto}}
     .bg-grid{position:fixed;inset:0;z-index:0;background-image:linear-gradient(rgba(77,159,255,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(77,159,255,0.025) 1px,transparent 1px);background-size:48px 48px;pointer-events:none}
     .bg-radial{position:fixed;inset:0;z-index:0;background:radial-gradient(ellipse 70% 50% at 50% -10%,rgba(0,229,160,0.08) 0%,transparent 60%);pointer-events:none}
     /* ── NAV ── */
