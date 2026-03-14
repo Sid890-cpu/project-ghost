@@ -683,14 +683,14 @@ function scrollTo(id) {
 </html>"""
         return HTMLResponse(html)
 
-    mcp_app = mcp.http_app(path="/mcp")
+    mcp_app = mcp.http_app()
     app = Starlette(routes=[
         Route("/", http_root, methods=["GET"]),
         Route("/distill", http_distill, methods=["POST"]),
         Route("/generate-key", http_generate_key, methods=["POST"]),
         Route("/health", http_health, methods=["GET"]),
         Route("/.well-known/mcp/server-card.json", http_server_card, methods=["GET"]),
-        Mount("/mcp", app=mcp_app),
+        Mount("/mcp/", app=mcp_app),
     ])
     app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 
