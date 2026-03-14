@@ -199,6 +199,10 @@
     .try-btn{padding:12px 28px;background:var(--green);color:var(--black);font-size:14px;font-weight:700;border-radius:8px;border:none;cursor:pointer;transition:all 0.2s;white-space:nowrap;font-family:'DM Sans',sans-serif}
     .try-btn:hover{background:var(--green-d);transform:translateY(-1px)}
     .try-btn:disabled{opacity:0.5;cursor:not-allowed;transform:none}
+    .try-presets{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+    .try-preset{background:var(--surface);border:1px solid var(--border2);border-radius:20px;padding:7px 16px;font-size:13px;color:var(--muted2);cursor:pointer;transition:all 0.2s;font-family:'DM Sans',sans-serif}
+    .try-preset:hover{border-color:rgba(0,229,160,0.4);color:var(--white);background:rgba(0,229,160,0.06)}
+    .try-preset.active{border-color:var(--green);color:var(--green);background:rgba(0,229,160,0.08)}
     .try-result{padding:20px}
     .try-result-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
     .try-status{font-family:'DM Mono',monospace;font-size:12px;color:var(--green);background:rgba(0,229,160,0.08);border:1px solid rgba(0,229,160,0.2);padding:3px 10px;border-radius:4px}
@@ -567,9 +571,17 @@
     <div class="reveal">
       <div class="section-tag">Try It Live</div>
       <h2 class="section-title">Try the API yourself.</h2>
-      <p class="section-sub">Enter any public URL and see Ghost extract structured signals in real time.</p>
+      <p class="section-sub">Pick a URL below — or enter your own — and watch Ghost extract structured intelligence in real time.</p>
     </div>
     <div class="try-box reveal">
+      <div class="try-presets">
+        <button class="try-preset active" onclick="setPreset(this,'https://apple.com')">🍎 Apple</button>
+        <button class="try-preset" onclick="setPreset(this,'https://github.com/trending')">🐙 GitHub Trending</button>
+        <button class="try-preset" onclick="setPreset(this,'https://news.ycombinator.com')">🟠 Hacker News</button>
+        <button class="try-preset" onclick="setPreset(this,'https://en.wikipedia.org/wiki/Artificial_intelligence')">📖 Wikipedia AI</button>
+        <button class="try-preset" onclick="setPreset(this,'https://openai.com')">🤖 OpenAI</button>
+        <button class="try-preset" onclick="setPreset(this,'https://stripe.com')">💳 Stripe</button>
+      </div>
       <div class="try-input-row">
         <div class="try-input-wrap">
           <span class="try-input-icon">🌐</span>
@@ -762,6 +774,13 @@ GET /search?<span class="tp">q</span>=<span class="ts">nvidia</span>&amp;<span c
 </footer>
 
 <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+  function setPreset(el, url) {
+    document.querySelectorAll('.try-preset').forEach(b => b.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('tryUrl').value = url;
+    runTry();
+  }
+
   async function runTry() {
     const url = document.getElementById('tryUrl').value.trim() || 'https://apple.com';
     trackEvent('demo_run', {url: url, page_location: window.location.href});
@@ -875,6 +894,22 @@ GET /search?<span class="tp">q</span>=<span class="ts">nvidia</span>&amp;<span c
     });
   }, {threshold:0.08});
   document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+  // Auto-run demo when Try It section scrolls into view
+  let demoAutoRun = false;
+  const demoIO = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if(e.isIntersecting && !demoAutoRun) {
+        demoAutoRun = true;
+        setTimeout(() => {
+          document.getElementById('tryUrl').value = 'https://apple.com';
+          runTry();
+        }, 600);
+      }
+    });
+  }, {threshold: 0.3});
+  const trySection = document.getElementById('tryit');
+  if(trySection) demoIO.observe(trySection);
 
   // Track scroll depth milestones
   const scrollMilestones = {25: false, 50: false, 75: false, 90: false};
