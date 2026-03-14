@@ -343,6 +343,33 @@ if __name__ == "__main__":
     async def http_health(request: Request):
         return JSONResponse({"status": "ok", "version": "2.0"})
 
+    async def http_server_card(request: Request):
+        from starlette.responses import JSONResponse as JR
+        return JR({
+            "name": "Project Ghost",
+            "description": "Web reading layer for AI agents. Convert any public URL into structured, agent-ready data — entities, signals, summary — in one tool call.",
+            "version": "2.0.0",
+            "url": "https://project-ghost-production.up.railway.app/mcp",
+            "homepage": "https://project-ghost-lilac.vercel.app",
+            "tools": [
+                {
+                    "name": "distill_web",
+                    "description": "Convert any public URL into structured intelligence. Returns title, summary, entities, confidence score and tokens saved.",
+                    "parameters": {
+                        "url": {
+                            "type": "string",
+                            "description": "Any publicly accessible URL to extract intelligence from",
+                            "required": True
+                        }
+                    }
+                }
+            ],
+            "authentication": {
+                "type": "api_key",
+                "description": "Get your free API key at https://project-ghost-lilac.vercel.app"
+            }
+        })
+
     async def http_root(request: Request):
         from starlette.responses import HTMLResponse
         html = """<!DOCTYPE html>
@@ -662,6 +689,7 @@ function scrollTo(id) {
         Route("/distill", http_distill, methods=["POST"]),
         Route("/generate-key", http_generate_key, methods=["POST"]),
         Route("/health", http_health, methods=["GET"]),
+        Route("/.well-known/mcp/server-card.json", http_server_card, methods=["GET"]),
         Mount("/", app=mcp_app),
     ])
     app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
