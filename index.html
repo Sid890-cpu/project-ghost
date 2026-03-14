@@ -782,7 +782,10 @@ GET /search?<span class="tp">q</span>=<span class="ts">nvidia</span>&amp;<span c
     try {
       const res = await fetch('https://project-ghost-production.up.railway.app/distill', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ghost_sk_BnNnqFiK3w6ra_7KCO72ShTjRyAtkmdjziAnyi_rDHg'
+        },
         body: JSON.stringify({ url })
       });
       const elapsed = ((Date.now() - t0) / 1000).toFixed(2) + 's';
