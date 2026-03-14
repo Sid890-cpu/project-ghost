@@ -6,6 +6,17 @@
   <title>Project Ghost — AI Web Intelligence Infrastructure</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%2300e5a0'/><text y='.9em' font-size='72' x='12'>👻</text></svg>">
   <meta name="description" content="Project Ghost converts messy web content into structured signals, entities, and memory so AI agents can make decisions without reading entire websites.">
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-NDWRMQYJHF"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-NDWRMQYJHF');
+    function trackEvent(name, params) {
+      if(window.gtag) gtag('event', name, params || {});
+    }
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
   <style>
@@ -368,7 +379,7 @@
   </div>
   <div class="nav-right">
     <a href="https://project-ghost-production.up.railway.app" target="_blank" class="btn-ghost">Docs</a>
-    <a href="https://project-ghost-production.up.railway.app/health" target="_blank" class="btn-solid">Live Demo →</a>
+    <a href="https://project-ghost-production.up.railway.app/health" target="_blank" class="btn-solid" onclick="trackEvent('live_demo_click', {})">Live Demo →</a>
   </div>
 </nav>
 
@@ -753,6 +764,7 @@ GET /search?<span class="tp">q</span>=<span class="ts">nvidia</span>&amp;<span c
 <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
   async function runTry() {
     const url = document.getElementById('tryUrl').value.trim() || 'https://apple.com';
+    trackEvent('demo_run', {url: url, page_location: window.location.href});
     const btn = document.getElementById('tryBtn');
     const btnText = document.getElementById('tryBtnText');
     const resultBox = document.getElementById('tryResult');
@@ -860,6 +872,33 @@ GET /search?<span class="tp">q</span>=<span class="ts">nvidia</span>&amp;<span c
     });
   }, {threshold:0.08});
   document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+  // Track scroll depth milestones
+  const scrollMilestones = {25: false, 50: false, 75: false, 90: false};
+  window.addEventListener('scroll', () => {
+    const pct = Math.round((window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100);
+    Object.keys(scrollMilestones).forEach(m => {
+      if (!scrollMilestones[m] && pct >= m) {
+        scrollMilestones[m] = true;
+        trackEvent('scroll_depth', {percent: parseInt(m)});
+      }
+    });
+  });
+
+  // Track section visibility
+  const sectionNames = {architecture:'Architecture',demo:'Demo',tryit:'Try It Live',usecases:'Use Cases',contact:'Get Access'};
+  const sectionIO = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if(e.isIntersecting) {
+        const id = e.target.id;
+        if(sectionNames[id]) trackEvent('section_view', {section: sectionNames[id]});
+      }
+    });
+  }, {threshold: 0.3});
+  Object.keys(sectionNames).forEach(id => {
+    const el = document.getElementById(id);
+    if(el) sectionIO.observe(el);
+  });
   const barIO = new IntersectionObserver(entries => {
     entries.forEach(e => {
       if (e.isIntersecting) {
@@ -912,6 +951,7 @@ GET /search?<span class="tp">q</span>=<span class="ts">nvidia</span>&amp;<span c
     })
     .then(() => {
       status.textContent = '✓ Request received! Your ghost_sk_ key will arrive within 24 hours.';
+      trackEvent('api_key_requested', {plan: plan, page_location: window.location.href});
       status.className = 'cf-status success';
       document.getElementById('cf-name').value = '';
       document.getElementById('cf-email').value = '';
