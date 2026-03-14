@@ -684,14 +684,26 @@ function scrollTo(id) {
         return HTMLResponse(html)
 
     mcp_app = mcp.http_app()
+
     app = Starlette(routes=[
         Route("/", http_root, methods=["GET"]),
         Route("/distill", http_distill, methods=["POST"]),
         Route("/generate-key", http_generate_key, methods=["POST"]),
         Route("/health", http_health, methods=["GET"]),
         Route("/.well-known/mcp/server-card.json", http_server_card, methods=["GET"]),
-        Mount("/mcp/", app=mcp_app),
+        Mount("/", app=mcp_app),
     ])
+    from starlette.middleware.base import BaseHTTPMiddleware
+    class SlashMiddleware(BaseHTTPMiddleware):
+        async def dispatch(self, request, call_next):
+            if request.url.path == "/mcp":
+                from starlette.datastructures import URL
+                scope = dict(request.scope)
+                scope["path"] = "/mcp/"
+                scope["raw_path"] = b"/mcp/"
+                request = request.__class__(scope, request._receive, request._send)
+            return await call_next(request)
+    app.add_middleware(SlashMiddleware)
     app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 
     import uvicorn
