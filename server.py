@@ -683,7 +683,7 @@ function scrollTo(id) {
 </html>"""
         return HTMLResponse(html)
 
-    mcp_app = mcp.http_app()
+    mcp_app = mcp.http_app(path="/mcp")
 
     app = Starlette(routes=[
         Route("/", http_root, methods=["GET"]),
@@ -691,7 +691,7 @@ function scrollTo(id) {
         Route("/generate-key", http_generate_key, methods=["POST"]),
         Route("/health", http_health, methods=["GET"]),
         Route("/.well-known/mcp/server-card.json", http_server_card, methods=["GET"]),
-        Mount("/", app=mcp_app),
+        Mount("/mcp", app=mcp_app),
     ])
     from starlette.middleware.base import BaseHTTPMiddleware
     class SlashMiddleware(BaseHTTPMiddleware):
