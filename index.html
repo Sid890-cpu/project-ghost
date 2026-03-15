@@ -275,6 +275,17 @@
     .plan-opt-detail{font-size:11px;color:var(--muted);font-family:'DM Mono',monospace}
     .plan-opt.selected .plan-opt-name{color:var(--green)}
     @media(max-width:480px){.plan-selector{grid-template-columns:1fr}}
+    /* CTA Popup */
+    .cta-popup{position:fixed;bottom:24px;right:24px;background:#0f1220;border:1px solid rgba(0,229,160,0.4);border-radius:16px;padding:20px 24px;max-width:320px;z-index:9997;box-shadow:0 8px 40px rgba(0,0,0,0.5);transform:translateY(100px);opacity:0;transition:all 0.4s cubic-bezier(0.175,0.885,0.32,1.275)}
+    .cta-popup.show{transform:translateY(0);opacity:1}
+    .cta-popup-close{position:absolute;top:10px;right:14px;color:var(--muted);cursor:pointer;font-size:16px;background:none;border:none;line-height:1}
+    .cta-popup-close:hover{color:var(--white)}
+    .cta-popup-tag{font-family:'DM Mono',monospace;font-size:10px;color:var(--green);letter-spacing:2px;margin-bottom:8px}
+    .cta-popup-title{font-size:15px;font-weight:700;color:var(--white);margin-bottom:6px;line-height:1.4}
+    .cta-popup-sub{font-size:12px;color:var(--muted2);margin-bottom:14px;line-height:1.6}
+    .cta-popup-btn{display:block;background:var(--green);color:#000;font-weight:700;font-size:13px;border:none;border-radius:8px;padding:10px 20px;cursor:pointer;text-align:center;text-decoration:none;transition:all 0.2s;width:100%}
+    .cta-popup-btn:hover{background:#00ffb3}
+    @media(max-width:480px){.cta-popup{left:16px;right:16px;max-width:none;bottom:16px}}
     .cc-icon{font-size:28px}
     .cc-title{font-size:16px;font-weight:600;color:var(--white)}
     .cc-desc{font-size:13px;color:var(--muted2);line-height:1.7;flex:1}
@@ -775,6 +786,15 @@ GET /search?<span class="tp">q</span>=<span class="ts">nvidia</span>&amp;<span c
   <div class="footer-right">Web Intelligence Infrastructure for AI Agents</div>
 </footer>
 
+<!-- CTA Popup -->
+<div class="cta-popup" id="ctaPopup">
+  <button class="cta-popup-close" onclick="closePopup()">✕</button>
+  <div class="cta-popup-tag">🎉 IT WORKS!</div>
+  <div class="cta-popup-title">Want to use this in your agent?</div>
+  <div class="cta-popup-sub">Get your free API key — 100 requests/month, no credit card needed. We'll email it within 24 hours.</div>
+  <a href="#contact" class="cta-popup-btn" onclick="closePopup()">Request Free API Key →</a>
+</div>
+
 <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
   function setPreset(el, url) {
     document.querySelectorAll('.try-preset').forEach(b => b.classList.remove('active'));
@@ -863,6 +883,9 @@ GET /search?<span class="tp">q</span>=<span class="ts">nvidia</span>&amp;<span c
       </div>`;
 
       body.innerHTML = html;
+      
+      // Show CTA popup after successful result
+      setTimeout(() => showPopup(), 1500);
 
     } catch(e) {
       resultBox.style.display = 'none';
@@ -953,6 +976,19 @@ GET /search?<span class="tp">q</span>=<span class="ts">nvidia</span>&amp;<span c
 
   // EmailJS init
   emailjs.init('UMQ-tfr_9iVu8Ck0D');
+
+  // CTA Popup
+  let popupShown = false;
+  function showPopup() {
+    if(popupShown) return;
+    popupShown = true;
+    document.getElementById('ctaPopup').classList.add('show');
+    trackEvent('cta_popup_shown', {});
+  }
+  function closePopup() {
+    document.getElementById('ctaPopup').classList.remove('show');
+    trackEvent('cta_popup_closed', {});
+  }
 
   function selectPlan(el, plan) {
     document.querySelectorAll('.plan-opt').forEach(o => o.classList.remove('selected'));
