@@ -239,6 +239,11 @@
     .try-bar{height:3px;background:var(--border);border-radius:2px;margin-top:10px;overflow:hidden}
     .try-bar-fill{height:100%;background:var(--green);border-radius:2px;transition:width 0.8s ease}
     .try-code{font-family:'DM Mono',monospace;font-size:11px;color:var(--green);background:rgba(0,229,160,0.05);border:1px solid rgba(0,229,160,0.15);border-radius:6px;padding:10px 14px;margin-top:14px;white-space:pre}
+    .try-output-row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:8px;flex-wrap:wrap}
+    .try-output-label{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:2px}
+    .try-download-btn{display:flex;align-items:center;gap:6px;background:rgba(0,229,160,0.08);border:1px solid rgba(0,229,160,0.3);color:var(--green);font-family:'DM Mono',monospace;font-size:11px;padding:6px 12px;border-radius:6px;cursor:pointer;transition:all 0.2s;white-space:nowrap;text-decoration:none}
+    .try-download-btn:hover{background:rgba(0,229,160,0.15);border-color:var(--green)}
+    .try-download-icon{font-size:13px}
     .try-spinner{width:16px;height:16px;border:2px solid var(--border2);border-top-color:var(--green);border-radius:50%;animation:spin 0.7s linear infinite;flex-shrink:0}
     .try-error{padding:16px 20px;font-family:'DM Mono',monospace;font-size:12px;color:#ff6b6b;background:rgba(255,107,107,0.06);border-top:1px solid rgba(255,107,107,0.15)}
     @keyframes spin{to{transform:rotate(360deg)}}
@@ -878,9 +883,17 @@ GET /search?<span class="tp">q</span>=<span class="ts">nvidia</span>&amp;<span c
         <div class="try-bar"><div class="try-bar-fill" style="width:${Math.round(confidence*100)}%"></div></div>
       </div>
       <div class="try-summary" style="grid-column:1/-1">
-        <div class="try-summary-label">AGENT-READY OUTPUT →</div>
+        <div class="try-output-row">
+          <div class="try-output-label">AGENT-READY OUTPUT →</div>
+          <button class="try-download-btn" onclick="downloadJSON()" id="downloadBtn">
+            <span class="try-download-icon">⬇</span> Download Full JSON
+          </button>
+        </div>
         <div class="try-code">{ url: "${url}", confidence: ${confidence}, tokens_saved: "${tokensSaved}", entities: ${JSON.stringify(allEntities.slice(0,5))} }</div>
       </div>`;
+      
+      // Store full data for download
+      window._lastGhostResult = data;
 
       body.innerHTML = html;
       
@@ -976,6 +989,20 @@ GET /search?<span class="tp">q</span>=<span class="ts">nvidia</span>&amp;<span c
 
   // EmailJS init
   emailjs.init('UMQ-tfr_9iVu8Ck0D');
+
+  // Download full JSON
+  function downloadJSON() {
+    if(!window._lastGhostResult) return;
+    const blob = new Blob([JSON.stringify(window._lastGhostResult, null, 2)], {type: 'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const hostname = (window._lastGhostResult.url || 'ghost').replace(/https?:\/\//, '').replace(/\//g, '-');
+    a.href = url;
+    a.download = `ghost-${hostname}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    trackEvent('json_downloaded', {url: window._lastGhostResult.url});
+  }
 
   // CTA Popup
   let popupShown = false;
