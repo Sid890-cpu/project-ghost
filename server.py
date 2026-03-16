@@ -21,6 +21,18 @@ def get_supabase():
 
 import secrets, hashlib
 
+# Only block domains that ALWAYS fail — never occasionally work
+BLOCKED_DOMAINS = {
+    "nike.com", "www.nike.com",
+    "wsj.com", "www.wsj.com",
+    "ft.com", "www.ft.com",
+    "makemytrip.com", "www.makemytrip.com",
+    "instagram.com", "www.instagram.com",
+    "facebook.com", "www.facebook.com",
+    "twitter.com", "www.twitter.com",
+    "x.com", "www.x.com",
+}
+
 PLAN_LIMITS = {
     "free":      100,
     "developer": 2000,
@@ -217,6 +229,20 @@ async def get_hybrid_intelligence(text: str):
 
 @mcp.tool
 async def distill_web(url: str):
+    # Check blocked domains first — saves time and avoids garbage results
+    try:
+        from urllib.parse import urlparse
+        domain = urlparse(url if url.startswith("http") else "https://" + url).netloc.lower()
+        if domain in BLOCKED_DOMAINS:
+            return {
+                "url": url,
+                "title": "Blocked",
+                "signals_data": {"error": "Scraper blocked", "integrity_layer": {"confidence_score": 0}},
+                "blocked_reason": f"{domain} uses enterprise Cloudflare protection. Try: apple.com, github.com/trending, news.ycombinator.com"
+            }
+    except:
+        pass
+
     text, error = await fetch_url(url)
     if error:
         return {
