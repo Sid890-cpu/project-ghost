@@ -729,14 +729,14 @@ GET /search?<span class="tp">q</span>=<span class="ts">nvidia</span>&amp;<span c
   <div class="section-wrap">
     <div class="reveal">
       <div class="section-tag">Get Access</div>
-      <h2 class="section-title">Request your API key.</h2>
-      <p class="section-sub">Fill in your details and choose a plan. We'll email your <code style="color:var(--green);background:rgba(0,229,160,0.08);padding:2px 7px;border-radius:4px;font-size:13px">ghost_sk_...</code> key within 24 hours.</p>
+      <h2 class="section-title">Get your API key instantly.</h2>
+      <p class="section-sub">No waitlist. No email confirmation. Just enter your email and get a working <code style="color:var(--green);background:rgba(0,229,160,0.08);padding:2px 7px;border-radius:4px;font-size:13px">ghost_sk_...</code> key in seconds.</p>
     </div>
 
     <div class="contact-form-wrap reveal">
-      <div class="contact-form-box">
-        <div class="cf-title">Request API Access</div>
-        <div class="cf-subtitle">Free plan includes 100 requests/month. No credit card needed.</div>
+      <div class="contact-form-box" id="keyGenBox">
+        <div class="cf-title">Get Free API Key</div>
+        <div class="cf-subtitle">100 requests/month · No credit card · Instant delivery</div>
         <div class="cf-field">
           <label class="cf-label">Your Name</label>
           <input type="text" id="cf-name" class="cf-input" placeholder="John Smith" />
@@ -767,8 +767,21 @@ GET /search?<span class="tp">q</span>=<span class="ts">nvidia</span>&amp;<span c
           <label class="cf-label">What are you building?</label>
           <textarea id="cf-message" class="cf-input cf-textarea" placeholder="e.g. A travel agent that compares flight prices, a research tool for my startup..."></textarea>
         </div>
-        <button class="cf-btn" onclick="sendContactForm()">Request API Key →</button>
+        <button class="cf-btn" id="getKeyBtn" onclick="getInstantKey()">⚡ Get Instant API Key</button>
         <div id="cf-status" class="cf-status"></div>
+        
+        <!-- Instant key result -->
+        <div id="keyResult" style="display:none">
+          <div style="background:rgba(0,229,160,0.06);border:1px solid rgba(0,229,160,0.3);border-radius:10px;padding:16px;margin-top:8px">
+            <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:2px;margin-bottom:10px">YOUR API KEY</div>
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+              <code id="generatedKey" style="font-family:'DM Mono',monospace;font-size:12px;color:var(--green);word-break:break-all;flex:1"></code>
+              <button onclick="copyKey()" style="background:rgba(0,229,160,0.1);border:1px solid rgba(0,229,160,0.3);color:var(--green);border-radius:6px;padding:4px 10px;cursor:pointer;font-size:12px;white-space:nowrap">Copy</button>
+            </div>
+            <div style="margin-top:12px;font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);letter-spacing:1px;margin-bottom:6px">QUICK START</div>
+            <div id="curlExample" style="background:#020305;border-radius:6px;padding:10px;font-family:'DM Mono',monospace;font-size:11px;color:#00e5a0;word-break:break-all;line-height:1.8"></div>
+          </div>
+        </div>
         <div class="contact-direct">
           <span class="contact-direct-label">Or email us directly →</span>
           <a href="https://mail.google.com/mail/?view=cm&to=ProjectGhost__@outlook.com&su=API Key Request" target="_blank" class="contact-direct-email">ProjectGhost__@outlook.com</a>
@@ -1015,6 +1028,83 @@ GET /search?<span class="tp">q</span>=<span class="ts">nvidia</span>&amp;<span c
   function closePopup() {
     document.getElementById('ctaPopup').classList.remove('show');
     trackEvent('cta_popup_closed', {});
+  }
+
+  async function getInstantKey() {
+    const name = document.getElementById('cf-name').value.trim();
+    const email = document.getElementById('cf-email').value.trim();
+    const plan = document.getElementById('cf-plan').value;
+    const status = document.getElementById('cf-status');
+    const btn = document.getElementById('getKeyBtn');
+
+    if (!email) {
+      status.textContent = '⚠ Please enter your email address.';
+      status.className = 'cf-status error';
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      status.textContent = '⚠ Please enter a valid email address.';
+      status.className = 'cf-status error';
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = '⏳ Generating your key...';
+    status.textContent = '';
+    status.className = 'cf-status';
+
+    try {
+      const res = await fetch('https://project-ghost-production.up.railway.app/generate-key', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ghost_master_2026_sid'
+        },
+        body: JSON.stringify({ email, name: name || email, plan })
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || !data.key) throw new Error(data.error || 'Failed to generate key');
+
+      // Show the key
+      document.getElementById('generatedKey').textContent = data.key;
+      document.getElementById('curlExample').innerHTML = 
+        `curl -X POST https://project-ghost-production.up.railway.app/distill \<br>` +
+        `&nbsp;&nbsp;-H "Authorization: Bearer ${data.key}" \<br>` +
+        `&nbsp;&nbsp;-H "Content-Type: application/json" \<br>` +
+        `&nbsp;&nbsp;-d '{"url": "https://apple.com"}'`;
+      document.getElementById('keyResult').style.display = 'block';
+
+      btn.textContent = '✓ Key Generated!';
+      btn.style.background = 'rgba(0,229,160,0.2)';
+      btn.style.color = 'var(--green)';
+      btn.style.border = '1px solid rgba(0,229,160,0.4)';
+
+      trackEvent('instant_key_generated', {plan: plan, email: email});
+
+      // Also send email notification
+      emailjs.send('service_6s1n7t4', 'template_dyzzftu', {
+        from_name: name || email,
+        from_email: email,
+        message: `[INSTANT KEY GENERATED]\nPlan: ${plan}\nKey: ${data.key}`,
+      }).catch(() => {});
+
+    } catch(e) {
+      status.textContent = '✗ Something went wrong. Email us at ProjectGhost__@outlook.com';
+      status.className = 'cf-status error';
+      btn.disabled = false;
+      btn.textContent = '⚡ Get Instant API Key';
+    }
+  }
+
+  function copyKey() {
+    const key = document.getElementById('generatedKey').textContent;
+    navigator.clipboard.writeText(key).then(() => {
+      const btn = event.target;
+      btn.textContent = '✓ Copied!';
+      setTimeout(() => btn.textContent = 'Copy', 2000);
+    });
   }
 
   function selectPlan(el, plan) {
