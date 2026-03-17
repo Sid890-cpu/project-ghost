@@ -773,10 +773,10 @@ GET /search?<span class="tp">q</span>=<span class="ts">nvidia</span>&amp;<span c
         <!-- Instant key result -->
         <div id="keyResult" style="display:none">
           <div style="background:rgba(0,229,160,0.06);border:1px solid rgba(0,229,160,0.3);border-radius:10px;padding:16px;margin-top:8px">
-            <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:2px;margin-bottom:10px">YOUR API KEY</div>
+            <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:2px;margin-bottom:10px">YOUR API KEY — use with Bearer prefix in requests</div>
             <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
               <code id="generatedKey" style="font-family:'DM Mono',monospace;font-size:12px;color:var(--green);word-break:break-all;flex:1"></code>
-              <button onclick="copyKey()" style="background:rgba(0,229,160,0.1);border:1px solid rgba(0,229,160,0.3);color:var(--green);border-radius:6px;padding:4px 10px;cursor:pointer;font-size:12px;white-space:nowrap">Copy</button>
+              <button id="copyKeyBtn" onclick="copyKey()" style="background:rgba(0,229,160,0.1);border:1px solid rgba(0,229,160,0.3);color:var(--green);border-radius:6px;padding:6px 14px;cursor:pointer;font-size:12px;white-space:nowrap;transition:all 0.2s">Copy Bearer Key</button>
             </div>
             <div style="margin-top:12px;font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);letter-spacing:1px;margin-bottom:6px">QUICK START</div>
             <div id="curlExample" style="background:#020305;border-radius:6px;padding:10px;font-family:'DM Mono',monospace;font-size:11px;color:#00e5a0;word-break:break-all;line-height:1.8"></div>
@@ -1070,10 +1070,17 @@ GET /search?<span class="tp">q</span>=<span class="ts">nvidia</span>&amp;<span c
       // Show the key
       document.getElementById('generatedKey').textContent = data.key;
       document.getElementById('curlExample').innerHTML = 
+        `<span style="color:#5a6480"># Add Bearer prefix before your key in every request</span><br>` +
+        `<span style="color:#60a5fa">Authorization: Bearer ${data.key}</span><br><br>` +
+        `<span style="color:#5a6480"># cURL</span><br>` +
         `curl -X POST https://project-ghost-production.up.railway.app/distill \<br>` +
-        `&nbsp;&nbsp;-H "Authorization: Bearer ${data.key}" \<br>` +
+        `&nbsp;&nbsp;-H <span style="color:#f59e0b">"Authorization: Bearer ${data.key}"</span> \<br>` +
         `&nbsp;&nbsp;-H "Content-Type: application/json" \<br>` +
-        `&nbsp;&nbsp;-d '{"url": "https://apple.com"}'`;
+        `&nbsp;&nbsp;-d '{"url": "https://apple.com"}'<br><br>` +
+        `<span style="color:#5a6480"># Python</span><br>` +
+        `requests.post("...railway.app/distill",<br>` +
+        `&nbsp;&nbsp;headers={"Authorization": <span style="color:#f59e0b">"Bearer ${data.key}"</span>},<br>` +
+        `&nbsp;&nbsp;json={"url": "https://apple.com"})`;
       document.getElementById('keyResult').style.display = 'block';
 
       btn.textContent = '✓ Key Generated!';
@@ -1100,8 +1107,24 @@ GET /search?<span class="tp">q</span>=<span class="ts">nvidia</span>&amp;<span c
 
   function copyKey() {
     const key = document.getElementById('generatedKey').textContent;
-    navigator.clipboard.writeText(key).then(() => {
-      const btn = event.target;
+    const btn = document.getElementById('copyKeyBtn');
+    navigator.clipboard.writeText('Bearer ' + key).then(() => {
+      btn.textContent = '✓ Copied!';
+      btn.style.background = 'rgba(0,229,160,0.2)';
+      btn.style.borderColor = 'var(--green)';
+      setTimeout(() => {
+        btn.textContent = 'Copy';
+        btn.style.background = 'rgba(0,229,160,0.1)';
+        btn.style.borderColor = 'rgba(0,229,160,0.3)';
+      }, 2000);
+    }).catch(() => {
+      // Fallback for browsers that block clipboard
+      const ta = document.createElement('textarea');
+      ta.value = 'Bearer ' + key;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
       btn.textContent = '✓ Copied!';
       setTimeout(() => btn.textContent = 'Copy', 2000);
     });
