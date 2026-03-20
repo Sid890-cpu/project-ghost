@@ -143,14 +143,49 @@ textarea.task::placeholder{color:var(--muted)}
 @keyframes bounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-5px)}}
 
 /* Key input */
-.key-row{display:flex;gap:8px;align-items:center;padding:12px 16px;background:var(--s2);border-bottom:1px solid var(--border)}
-.key-input{flex:1;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:7px 10px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:11px;outline:none}
-.key-input:focus{border-color:rgba(0,255,157,0.3)}
-.key-label{font-size:9px;color:var(--muted);letter-spacing:2px;white-space:nowrap}
+.key-row{display:none}
 
-@media(max-width:640px){
-  .layout{grid-template-columns:1fr}
-  .panel{display:none}
+
+
+
+@media(max-width:768px){
+  .layout{grid-template-columns:1fr;grid-template-rows:auto 1fr}
+  .panel{display:flex;flex-direction:column;border-right:none;border-bottom:1px solid var(--border);max-height:none;overflow:visible}
+  .panel .sources{display:none}
+  .panel-section{padding:12px}
+  textarea.task{min-height:60px;font-size:11px}
+  .run{padding:10px;font-size:11px}
+  .preset-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  .preset{font-size:10px;padding:8px 8px}
+  .panel-section:last-of-type{border-top:1px solid var(--border)}
+  html,body{overflow:auto}
+  header{padding:10px 16px;flex-wrap:wrap;gap:8px}
+  .h-divider{display:none}
+  .h-model{display:none}
+  .h-status{font-size:10px}
+  .h-title{font-size:12px;letter-spacing:1px}
+  .term-bar{padding:8px 12px;gap:6px}
+  .term-title{font-size:10px}
+  .term-badge{font-size:9px;padding:2px 8px}
+  .output{padding:16px;gap:14px}
+  .log{font-size:11px;line-height:1.7}
+  .log-time{display:none}
+  .rb-header{padding:10px 12px;flex-wrap:wrap;gap:6px}
+  .rb-title{font-size:12px}
+  .rb-badge{font-size:9px}
+  .rb-body{padding:12px}
+  .rb-summary{font-size:12px}
+  .rb-meta{gap:10px}
+  .rb-stat{font-size:9px}
+  .ent{font-size:9px}
+  .synthesis{padding:14px}
+  .syn-label{font-size:9px}
+  .syn-text{font-size:12px;line-height:1.7}
+  .syn-stats{gap:12px;flex-wrap:wrap}
+  .syn-stat{font-size:10px}
+  .result-block{border-radius:8px}
+  .welcome-ascii{font-size:7px;line-height:1.2}
+  .thinking-line{font-size:11px}
 }
 </style>
 </head>
