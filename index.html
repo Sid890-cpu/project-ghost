@@ -301,6 +301,12 @@
       nav{padding:0 20px}
       .nav-center{display:none}
       .btn-ghost{display:none}
+      .mobile-menu-btn{display:flex !important}
+      .mobile-menu{display:none;position:fixed;inset:0;background:rgba(2,3,5,0.98);z-index:999;flex-direction:column;align-items:center;justify-content:center;gap:28px}
+      .mobile-menu.open{display:flex}
+      .mobile-menu a{font-size:20px;color:var(--text);text-decoration:none;font-weight:600}
+      .mobile-menu a:hover{color:var(--green)}
+      .mobile-menu-close{position:absolute;top:20px;right:24px;font-size:24px;color:var(--muted);cursor:pointer;background:none;border:none}
       .hero{padding:100px 16px 60px}
       .hero-eyebrow{font-size:11px;padding:5px 12px 5px 8px}
       .eyebrow-text{white-space:normal;line-height:1.4}
@@ -398,12 +404,28 @@
     <a href="#demo">Demo</a>
     <a href="#use-cases">Use Cases</a>
     <a href="#api">API</a>
+    <a href="/ghost-demo.html" target="_blank" style="color:var(--green)">▶ Agent Demo</a>
+    <a href="/integrate.html" target="_blank">Integrate</a>
   </div>
   <div class="nav-right">
     <a href="https://project-ghost-production.up.railway.app" target="_blank" class="btn-ghost">Docs</a>
     <a href="https://project-ghost-production.up.railway.app/health" target="_blank" class="btn-solid" onclick="trackEvent('live_demo_click', {})">Live Demo →</a>
+    <button class="mobile-menu-btn" onclick="toggleMobileMenu()" style="display:none;background:none;border:none;color:var(--text);font-size:22px;cursor:pointer;padding:4px;margin-left:8px">☰</button>
   </div>
 </nav>
+
+<!-- Mobile Menu -->
+<div class="mobile-menu" id="mobileMenu">
+  <button class="mobile-menu-close" onclick="toggleMobileMenu()">✕</button>
+  <a href="#architecture" onclick="toggleMobileMenu()">Architecture</a>
+  <a href="#demo" onclick="toggleMobileMenu()">Demo</a>
+  <a href="#use-cases" onclick="toggleMobileMenu()">Use Cases</a>
+  <a href="#api" onclick="toggleMobileMenu()">API</a>
+  <a href="/ghost-demo.html" target="_blank" style="color:var(--green)">▶ Agent Demo</a>
+  <a href="/integrate.html" target="_blank">Integration Guide</a>
+  <a href="#contact" onclick="toggleMobileMenu()">Get API Key</a>
+  <a href="https://project-ghost-production.up.railway.app" target="_blank">Docs ↗</a>
+</div>
 
 <section class="hero">
   <div class="hero-eyebrow">
@@ -798,6 +820,8 @@ GET /search?<span class="tp">q</span>=<span class="ts">nvidia</span>&amp;<span c
     <a href="#demo">Demo</a>
     <a href="#api">API</a>
     <a href="#contact">Contact</a>
+    <a href="/ghost-demo.html" target="_blank">Agent Demo ↗</a>
+    <a href="/integrate.html" target="_blank">Integration Guide ↗</a>
     <a href="https://project-ghost-production.up.railway.app" target="_blank">Docs ↗</a>
     <a href="https://github.com/Sid890-cpu/project-ghost" target="_blank">GitHub ↗</a>
   </div>
@@ -1128,6 +1152,10 @@ GET /search?<span class="tp">q</span>=<span class="ts">nvidia</span>&amp;<span c
       btn.textContent = '✓ Copied!';
       setTimeout(() => btn.textContent = 'Copy', 2000);
     });
+  }
+
+  function toggleMobileMenu() {
+    document.getElementById('mobileMenu').classList.toggle('open');
   }
 
   function selectPlan(el, plan) {
