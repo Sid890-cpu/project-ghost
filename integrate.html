@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Integrate Ghost API — Add web reading to your AI agent in 5 minutes</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#050508;--surface:#0c0c12;--card:#111118;
+  --border:#1e1e2e;--green:#00e5a0;--green2:#00b87d;
+  --blue:#4d9fff;--amber:#f5a623;--text:#e8e8f0;--muted:#6b6b8a;--white:#fff;
+}
+body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;line-height:1.7;overflow-x:hidden}
+
+/* Grid bg */
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,229,160,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,160,0.03) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0}
+
+/* Nav */
+nav{display:flex;align-items:center;justify-content:space-between;padding:16px 40px;border-bottom:1px solid var(--border);position:sticky;top:0;background:rgba(5,5,8,0.95);backdrop-filter:blur(10px);z-index:100}
+.nav-logo{display:flex;align-items:center;gap:8px;text-decoration:none;color:var(--white);font-weight:800;font-size:16px}
+.nav-logo-icon{width:28px;height:28px;background:var(--green);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px}
+.nav-logo span{color:var(--green)}
+.nav-cta{background:var(--green);color:#000;font-weight:700;font-size:12px;border:none;border-radius:6px;padding:8px 16px;cursor:pointer;text-decoration:none;font-family:'Syne',sans-serif}
+
+/* Layout */
+.layout{display:grid;grid-template-columns:240px 1fr;min-height:calc(100vh - 57px);position:relative;z-index:1;max-width:1200px;margin:0 auto}
+
+/* Sidebar */
+.sidebar{padding:32px 20px;position:sticky;top:57px;height:calc(100vh - 57px);overflow-y:auto;border-right:1px solid var(--border)}
+.sidebar-section{font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;margin-top:24px}
+.sidebar-section:first-child{margin-top:0}
+.sidebar-link{display:block;padding:6px 10px;font-size:13px;color:var(--muted);text-decoration:none;border-radius:6px;border-left:2px solid transparent;transition:all 0.2s;margin-bottom:2px}
+.sidebar-link:hover,.sidebar-link.active{color:var(--green);border-left-color:var(--green);background:rgba(0,229,160,0.05)}
+
+/* Content */
+.content{padding:48px 56px;max-width:800px}
+.page-tag{font-family:'Space Mono',monospace;font-size:11px;color:var(--green);letter-spacing:2px;margin-bottom:12px}
+.page-title{font-size:36px;font-weight:800;color:var(--white);line-height:1.2;margin-bottom:12px}
+.page-sub{font-size:16px;color:var(--muted);margin-bottom:48px;max-width:600px}
+
+/* Sections */
+.section{margin-bottom:56px}
+.section-title{font-size:22px;font-weight:700;color:var(--white);margin-bottom:8px;padding-top:48px;border-top:1px solid var(--border)}
+.section-sub{font-size:14px;color:var(--muted);margin-bottom:24px}
+
+/* Framework tabs */
+.tabs{display:flex;gap:4px;margin-bottom:0;border-bottom:1px solid var(--border)}
+.tab{padding:8px 16px;font-size:13px;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all 0.2s;font-family:'Space Mono',monospace}
+.tab.active{color:var(--green);border-bottom-color:var(--green)}
+.tab-content{display:none}
+.tab-content.active{display:block}
+
+/* Code blocks */
+.code-block{background:#020305;border:1px solid var(--border);border-radius:0 0 10px 10px;overflow:hidden}
+.code-header{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-bottom:1px solid var(--border);background:#0a0a10}
+.code-lang{font-family:'Space Mono',monospace;font-size:11px;color:var(--muted)}
+.copy-btn{font-family:'Space Mono',monospace;font-size:11px;color:var(--green);background:none;border:none;cursor:pointer;padding:2px 8px;border-radius:4px;transition:all 0.2s}
+.copy-btn:hover{background:rgba(0,229,160,0.1)}
+pre{padding:20px;font-family:'Space Mono',monospace;font-size:12px;line-height:1.8;overflow-x:auto;color:#abb2bf}
+.kw{color:#c678dd}
+.fn{color:#61afef}
+.str{color:#00e5a0}
+.cm{color:#5c6370;font-style:italic}
+.var{color:#e06c75}
+.num{color:#d19a66}
+
+/* Step cards */
+.steps{display:flex;flex-direction:column;gap:16px}
+.step{display:flex;gap:16px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:20px}
+.step-num{width:32px;height:32px;background:rgba(0,229,160,0.1);border:1px solid rgba(0,229,160,0.3);border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:13px;color:var(--green);flex-shrink:0;font-weight:700}
+.step-content{}
+.step-title{font-size:15px;font-weight:700;color:var(--white);margin-bottom:4px}
+.step-desc{font-size:13px;color:var(--muted);line-height:1.6}
+
+/* Response example */
+.response-box{background:#020305;border:1px solid rgba(0,229,160,0.2);border-radius:10px;padding:20px;font-family:'Space Mono',monospace;font-size:12px;line-height:1.8}
+.rk{color:var(--blue)}
+.rv{color:var(--green)}
+.rm{color:var(--muted)}
+
+/* Info box */
+.info-box{background:rgba(0,229,160,0.04);border:1px solid rgba(0,229,160,0.2);border-radius:8px;padding:16px 20px;font-size:13px;color:var(--muted);line-height:1.7;margin:16px 0}
+.info-box strong{color:var(--green)}
+
+/* Framework cards */
+.framework-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:32px}
+.fw-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;cursor:pointer;transition:all 0.2s;text-align:center}
+.fw-card:hover,.fw-card.active{border-color:rgba(0,229,160,0.4);background:rgba(0,229,160,0.04)}
+.fw-icon{font-size:24px;margin-bottom:8px}
+.fw-name{font-size:14px;font-weight:700;color:var(--white)}
+.fw-desc{font-size:11px;color:var(--muted);font-family:'Space Mono',monospace;margin-top:4px}
+
+@media(max-width:768px){
+  .layout{grid-template-columns:1fr}
+  .sidebar{display:none}
+  .content{padding:32px 20px}
+  .framework-grid{grid-template-columns:1fr 1fr}
+  nav{padding:12px 20px}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="https://project-ghost-lilac.vercel.app" class="nav-logo">
+    <div class="nav-logo-icon">👻</div>
+    Project<span>Ghost</span>
+  </a>
+  <a href="https://project-ghost-lilac.vercel.app/#contact" class="nav-cta">Get Free API Key →</a>
+</nav>
+
+<div class="layout">
+  <div class="sidebar">
+    <div class="sidebar-section">Getting Started</div>
+    <a href="#quickstart" class="sidebar-link active">Quick Start</a>
+    <a href="#response" class="sidebar-link">Response Format</a>
+    <div class="sidebar-section">Frameworks</div>
+    <a href="#langchain" class="sidebar-link">LangChain</a>
+    <a href="#openai" class="sidebar-link">OpenAI Agents</a>
+    <a href="#cursor" class="sidebar-link">Cursor / MCP</a>
+    <a href="#crewai" class="sidebar-link">CrewAI</a>
+    <a href="#raw" class="sidebar-link">Raw Python / JS</a>
+    <div class="sidebar-section">Reference</div>
+    <a href="#plans" class="sidebar-link">Plans & Limits</a>
+    <a href="#errors" class="sidebar-link">Error Handling</a>
+  </div>
+
+  <div class="content">
+    <div class="page-tag">INTEGRATION GUIDE</div>
+    <h1 class="page-title">Add web reading to your AI agent in 5 minutes</h1>
+    <p class="page-sub">One API call. Any public URL. Your agent gets structured intelligence — entities, summary, confidence score — ready to reason over.</p>
+
+    <!-- Quick Start -->
+    <div class="section" id="quickstart">
+      <div class="section-title">Quick Start</div>
+      <div class="section-sub">Get your first result in under 2 minutes.</div>
+
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-content">
+            <div class="step-title">Get your free API key</div>
+            <div class="step-desc">Go to <a href="https://project-ghost-lilac.vercel.app/#contact" style="color:var(--green)">project-ghost-lilac.vercel.app</a> → enter your email → get an instant <code style="color:var(--green);background:rgba(0,229,160,0.08);padding:1px 6px;border-radius:3px">ghost_sk_...</code> key. No credit card. Free plan includes 100 requests/month.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-content">
+            <div class="step-title">Make your first API call</div>
+            <div class="step-desc">POST any public URL to <code style="color:var(--green);background:rgba(0,229,160,0.08);padding:1px 6px;border-radius:3px">/distill</code> with your key in the Authorization header.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-content">
+            <div class="step-title">Use the structured response</div>
+            <div class="step-desc">Get back title, summary, entities, confidence score, and tokens saved — all ready for your agent to reason over.</div>
+          </div>
+        </div>
+      </div>
+
+      <br>
+      <div class="tabs" id="quickstart-tabs">
+        <div class="tab active" onclick="switchTab('quickstart','curl')">cURL</div>
+        <div class="tab" onclick="switchTab('quickstart','python')">Python</div>
+        <div class="tab" onclick="switchTab('quickstart','js')">JavaScript</div>
+      </div>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">Terminal</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+        <div id="quickstart-curl" class="tab-content active">
+<pre>curl -X POST https://project-ghost-production.up.railway.app/distill \
+  -H <span class="str">"Authorization: Bearer ghost_sk_YOUR_KEY"</span> \
+  -H <span class="str">"Content-Type: application/json"</span> \
+  -d <span class="str">'{"url": "https://apple.com"}'</span></pre>
+        </div>
+        <div id="quickstart-python" class="tab-content">
+<pre><span class="kw">import</span> requests
+
+response = requests.<span class="fn">post</span>(
+    <span class="str">"https://project-ghost-production.up.railway.app/distill"</span>,
+    headers={<span class="str">"Authorization"</span>: <span class="str">"Bearer ghost_sk_YOUR_KEY"</span>},
+    json={<span class="str">"url"</span>: <span class="str">"https://apple.com"</span>}
+)
+
+data = response.<span class="fn">json</span>()
+<span class="fn">print</span>(data[<span class="str">"title"</span>])
+<span class="fn">print</span>(data[<span class="str">"signals_data"</span>][<span class="str">"decision_signal"</span>][<span class="str">"business_intent"</span>])
+<span class="fn">print</span>(data[<span class="str">"tokens_saved"</span>])</pre>
+        </div>
+        <div id="quickstart-js" class="tab-content">
+<pre><span class="kw">const</span> response = <span class="kw">await</span> <span class="fn">fetch</span>(
+  <span class="str">"https://project-ghost-production.up.railway.app/distill"</span>,
+  {
+    method: <span class="str">"POST"</span>,
+    headers: {
+      <span class="str">"Authorization"</span>: <span class="str">"Bearer ghost_sk_YOUR_KEY"</span>,
+      <span class="str">"Content-Type"</span>: <span class="str">"application/json"</span>
+    },
+    body: <span class="fn">JSON.stringify</span>({ url: <span class="str">"https://apple.com"</span> })
+  }
+);
+
+<span class="kw">const</span> data = <span class="kw">await</span> response.<span class="fn">json</span>();
+console.<span class="fn">log</span>(data.signals_data.decision_signal.business_intent);</pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- Response Format -->
+    <div class="section" id="response">
+      <div class="section-title">Response Format</div>
+      <div class="section-sub">Every successful call returns this structure.</div>
+      <div class="response-box">
+{<br>
+&nbsp;&nbsp;<span class="rk">"url"</span>: <span class="rv">"https://apple.com"</span>,<br>
+&nbsp;&nbsp;<span class="rk">"title"</span>: <span class="rv">"Apple"</span>,<br>
+&nbsp;&nbsp;<span class="rk">"tokens_saved"</span>: <span class="rv">"80.7%"</span>,<br>
+&nbsp;&nbsp;<span class="rk">"signals_data"</span>: {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="rk">"decision_signal"</span>: {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="rk">"business_intent"</span>: <span class="rv">"Apple promotes its latest hardware..."</span>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="rk">"priority_score"</span>: <span class="rv">8</span>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="rk">"category"</span>: <span class="rv">"Technology"</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;},<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="rk">"items"</span>: [<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{ <span class="rk">"title"</span>: <span class="rv">"MacBook Pro"</span>, <span class="rk">"entities"</span>: [<span class="rv">"Apple"</span>, <span class="rv">"M5"</span>], <span class="rk">"impact_score"</span>: <span class="rv">9</span> }<br>
+&nbsp;&nbsp;&nbsp;&nbsp;],<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="rk">"integrity_layer"</span>: {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="rk">"confidence_score"</span>: <span class="rv">0.87</span>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="rk">"is_high_integrity"</span>: <span class="rv">true</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;},<br>
+&nbsp;&nbsp;<span class="rk">"_usage"</span>: { <span class="rk">"plan"</span>: <span class="rv">"free"</span>, <span class="rk">"used"</span>: <span class="rv">1</span>, <span class="rk">"limit"</span>: <span class="rv">100</span>, <span class="rk">"remaining"</span>: <span class="rv">99</span> }<br>
+}
+      </div>
+    </div>
+
+    <!-- LangChain -->
+    <div class="section" id="langchain">
+      <div class="section-title">LangChain Integration</div>
+      <div class="section-sub">Add Ghost as a custom tool your LangChain agent can call.</div>
+      <div class="tabs">
+        <div class="tab active">Python</div>
+      </div>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">Python · LangChain</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+<pre><span class="kw">from</span> langchain.tools <span class="kw">import</span> tool
+<span class="kw">import</span> requests
+
+GHOST_KEY = <span class="str">"Bearer ghost_sk_YOUR_KEY"</span>
+
+<span class="var">@tool</span>
+<span class="kw">def</span> <span class="fn">read_webpage</span>(url: str) -> dict:
+    <span class="str">"""Read any public URL and extract structured intelligence.
+    Returns title, summary, entities, and confidence score.
+    Use this when you need to understand what a webpage is about."""</span>
+    response = requests.<span class="fn">post</span>(
+        <span class="str">"https://project-ghost-production.up.railway.app/distill"</span>,
+        headers={<span class="str">"Authorization"</span>: GHOST_KEY},
+        json={<span class="str">"url"</span>: url}
+    )
+    data = response.<span class="fn">json</span>()
+    sd = data.<span class="fn">get</span>(<span class="str">"signals_data"</span>, {})
+    <span class="kw">return</span> {
+        <span class="str">"title"</span>: data.<span class="fn">get</span>(<span class="str">"title"</span>),
+        <span class="str">"summary"</span>: sd.<span class="fn">get</span>(<span class="str">"decision_signal"</span>, {}).<span class="fn">get</span>(<span class="str">"business_intent"</span>),
+        <span class="str">"entities"</span>: [e <span class="kw">for</span> item <span class="kw">in</span> sd.<span class="fn">get</span>(<span class="str">"items"</span>, []) <span class="kw">for</span> e <span class="kw">in</span> item.<span class="fn">get</span>(<span class="str">"entities"</span>, [])],
+        <span class="str">"confidence"</span>: sd.<span class="fn">get</span>(<span class="str">"integrity_layer"</span>, {}).<span class="fn">get</span>(<span class="str">"confidence_score"</span>),
+        <span class="str">"tokens_saved"</span>: data.<span class="fn">get</span>(<span class="str">"tokens_saved"</span>)
+    }
+
+<span class="cm"># Add to your agent</span>
+tools = [read_webpage]
+agent = <span class="fn">initialize_agent</span>(tools, llm, agent=<span class="str">"zero-shot-react-description"</span>)
+agent.<span class="fn">run</span>(<span class="str">"Research what OpenAI is currently working on"</span>)</pre>
+      </div>
+    </div>
+
+    <!-- OpenAI -->
+    <div class="section" id="openai">
+      <div class="section-title">OpenAI Agents SDK</div>
+      <div class="section-sub">Use Ghost as a function tool with the OpenAI Agents SDK.</div>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">Python · OpenAI Agents</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+<pre><span class="kw">from</span> agents <span class="kw">import</span> Agent, function_tool
+<span class="kw">import</span> requests
+
+GHOST_KEY = <span class="str">"Bearer ghost_sk_YOUR_KEY"</span>
+
+<span class="var">@function_tool</span>
+<span class="kw">def</span> <span class="fn">read_webpage</span>(url: str) -> str:
+    <span class="str">"""Read any public URL and get structured intelligence about it."""</span>
+    res = requests.<span class="fn">post</span>(
+        <span class="str">"https://project-ghost-production.up.railway.app/distill"</span>,
+        headers={<span class="str">"Authorization"</span>: GHOST_KEY},
+        json={<span class="str">"url"</span>: url}
+    ).<span class="fn">json</span>()
+    sd = res.<span class="fn">get</span>(<span class="str">"signals_data"</span>, {})
+    intent = sd.<span class="fn">get</span>(<span class="str">"decision_signal"</span>, {}).<span class="fn">get</span>(<span class="str">"business_intent"</span>, <span class="str">"No summary"</span>)
+    entities = [e <span class="kw">for</span> i <span class="kw">in</span> sd.<span class="fn">get</span>(<span class="str">"items"</span>,[]) <span class="kw">for</span> e <span class="kw">in</span> i.<span class="fn">get</span>(<span class="str">"entities"</span>,[])]
+    <span class="kw">return</span> <span class="fn">f</span><span class="str">"""Title: {res.get('title')}
+Summary: {intent}
+Entities: {', '.join(entities[:8])}
+Confidence: {sd.get('integrity_layer',{}).get('confidence_score')}"""</span>
+
+agent = <span class="fn">Agent</span>(
+    name=<span class="str">"Research Agent"</span>,
+    instructions=<span class="str">"You research topics by reading web pages using the read_webpage tool."</span>,
+    tools=[read_webpage]
+)
+
+<span class="kw">from</span> agents <span class="kw">import</span> Runner
+result = <span class="kw">await</span> Runner.<span class="fn">run</span>(agent, <span class="str">"What is Stripe building right now?"</span>)
+<span class="fn">print</span>(result.final_output)</pre>
+      </div>
+    </div>
+
+    <!-- Cursor MCP -->
+    <div class="section" id="cursor">
+      <div class="section-title">Cursor / Claude Desktop (MCP)</div>
+      <div class="section-sub">Add Ghost directly as an MCP tool — no code needed.</div>
+      <div class="info-box">
+        <strong>What this does:</strong> Your Cursor or Claude Desktop agent gets a <code>distill_web</code> tool it can call on any URL automatically during a conversation.
+      </div>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">JSON · MCP Config</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+<pre>{
+  <span class="rk">"mcpServers"</span>: {
+    <span class="rk">"project-ghost"</span>: {
+      <span class="rk">"url"</span>: <span class="rv">"https://project-ghost-production.up.railway.app/mcp"</span>,
+      <span class="rk">"transport"</span>: <span class="rv">"http"</span>
+    }
+  }
+}</pre>
+      </div>
+      <div class="info-box" style="margin-top:12px">
+        <strong>Where to add this:</strong> Cursor → Settings → MCP Servers → paste config. Claude Desktop → claude_desktop_config.json → add mcpServers block.
+      </div>
+    </div>
+
+    <!-- CrewAI -->
+    <div class="section" id="crewai">
+      <div class="section-title">CrewAI Integration</div>
+      <div class="section-sub">Add Ghost as a tool for any CrewAI agent.</div>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">Python · CrewAI</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+<pre><span class="kw">from</span> crewai_tools <span class="kw">import</span> BaseTool
+<span class="kw">import</span> requests
+
+<span class="kw">class</span> <span class="fn">GhostWebReader</span>(BaseTool):
+    name: str = <span class="str">"Web Intelligence Reader"</span>
+    description: str = <span class="str">"Read any public URL and extract structured intelligence including entities, summary and confidence score"</span>
+
+    <span class="kw">def</span> <span class="fn">_run</span>(self, url: str) -> str:
+        res = requests.<span class="fn">post</span>(
+            <span class="str">"https://project-ghost-production.up.railway.app/distill"</span>,
+            headers={<span class="str">"Authorization"</span>: <span class="str">"Bearer ghost_sk_YOUR_KEY"</span>},
+            json={<span class="str">"url"</span>: url}
+        ).<span class="fn">json</span>()
+        sd = res.<span class="fn">get</span>(<span class="str">"signals_data"</span>, {})
+        <span class="kw">return</span> <span class="fn">str</span>({
+            <span class="str">"title"</span>: res.<span class="fn">get</span>(<span class="str">"title"</span>),
+            <span class="str">"summary"</span>: sd.<span class="fn">get</span>(<span class="str">"decision_signal"</span>,{}).<span class="fn">get</span>(<span class="str">"business_intent"</span>),
+            <span class="str">"entities"</span>: [e <span class="kw">for</span> i <span class="kw">in</span> sd.<span class="fn">get</span>(<span class="str">"items"</span>,[]) <span class="kw">for</span> e <span class="kw">in</span> i.<span class="fn">get</span>(<span class="str">"entities"</span>,[])],
+        })
+
+<span class="cm"># Use in your crew</span>
+researcher = <span class="fn">Agent</span>(
+    role=<span class="str">"Web Researcher"</span>,
+    goal=<span class="str">"Research topics by reading websites"</span>,
+    tools=[<span class="fn">GhostWebReader</span>()]
+)</pre>
+      </div>
+    </div>
+
+    <!-- Raw Python/JS -->
+    <div class="section" id="raw">
+      <div class="section-title">Raw Python / JavaScript</div>
+      <div class="section-sub">No framework? Use Ghost directly in any script.</div>
+      <div class="tabs" id="raw-tabs">
+        <div class="tab active" onclick="switchTab('raw','python')">Python</div>
+        <div class="tab" onclick="switchTab('raw','js')">JavaScript</div>
+        <div class="tab" onclick="switchTab('raw','async')">Python Async</div>
+      </div>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">Python</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+        <div id="raw-python" class="tab-content active">
+<pre><span class="kw">import</span> requests
+
+<span class="kw">def</span> <span class="fn">ghost_read</span>(url: str, api_key: str) -> dict:
+    <span class="str">"""Read any URL and get structured intelligence."""</span>
+    res = requests.<span class="fn">post</span>(
+        <span class="str">"https://project-ghost-production.up.railway.app/distill"</span>,
+        headers={<span class="str">"Authorization"</span>: <span class="fn">f</span><span class="str">"Bearer {api_key}"</span>},
+        json={<span class="str">"url"</span>: url},
+        timeout=<span class="num">30</span>
+    )
+    res.<span class="fn">raise_for_status</span>()
+    <span class="kw">return</span> res.<span class="fn">json</span>()
+
+<span class="cm"># Usage</span>
+result = <span class="fn">ghost_read</span>(<span class="str">"https://openai.com"</span>, <span class="str">"ghost_sk_YOUR_KEY"</span>)
+sd = result[<span class="str">"signals_data"</span>]
+
+<span class="fn">print</span>(<span class="fn">f</span><span class="str">"Title: {result['title']}"</span>)
+<span class="fn">print</span>(<span class="fn">f</span><span class="str">"Summary: {sd['decision_signal']['business_intent']}"</span>)
+<span class="fn">print</span>(<span class="fn">f</span><span class="str">"Entities: {[e for i in sd['items'] for e in i['entities']]}"</span>)
+<span class="fn">print</span>(<span class="fn">f</span><span class="str">"Tokens saved: {result['tokens_saved']}"</span>)</pre>
+        </div>
+        <div id="raw-js" class="tab-content">
+<pre><span class="kw">async function</span> <span class="fn">ghostRead</span>(url, apiKey) {
+  <span class="kw">const</span> res = <span class="kw">await</span> <span class="fn">fetch</span>(
+    <span class="str">"https://project-ghost-production.up.railway.app/distill"</span>,
+    {
+      method: <span class="str">"POST"</span>,
+      headers: {
+        <span class="str">"Authorization"</span>: <span class="fn">`Bearer ${apiKey}`</span>,
+        <span class="str">"Content-Type"</span>: <span class="str">"application/json"</span>
+      },
+      body: <span class="fn">JSON.stringify</span>({ url })
+    }
+  );
+  <span class="kw">return</span> res.<span class="fn">json</span>();
+}
+
+<span class="cm">// Usage</span>
+<span class="kw">const</span> data = <span class="kw">await</span> <span class="fn">ghostRead</span>(<span class="str">"https://openai.com"</span>, <span class="str">"ghost_sk_YOUR_KEY"</span>);
+<span class="kw">const</span> { decision_signal, items, integrity_layer } = data.signals_data;
+
+console.<span class="fn">log</span>(decision_signal.business_intent);
+console.<span class="fn">log</span>(items.<span class="fn">flatMap</span>(i => i.entities));
+console.<span class="fn">log</span>(<span class="fn">`Confidence: ${integrity_layer.confidence_score}`</span>);</pre>
+        </div>
+        <div id="raw-async" class="tab-content">
+<pre><span class="kw">import</span> asyncio
+<span class="kw">import</span> httpx
+
+<span class="kw">async def</span> <span class="fn">ghost_read</span>(url: str, api_key: str) -> dict:
+    <span class="kw">async with</span> httpx.<span class="fn">AsyncClient</span>(timeout=<span class="num">30</span>) <span class="kw">as</span> client:
+        res = <span class="kw">await</span> client.<span class="fn">post</span>(
+            <span class="str">"https://project-ghost-production.up.railway.app/distill"</span>,
+            headers={<span class="str">"Authorization"</span>: <span class="fn">f</span><span class="str">"Bearer {api_key}"</span>},
+            json={<span class="str">"url"</span>: url}
+        )
+        <span class="kw">return</span> res.<span class="fn">json</span>()
+
+<span class="cm"># Read multiple URLs concurrently</span>
+<span class="kw">async def</span> <span class="fn">research_multiple</span>(urls: list, api_key: str):
+    tasks = [<span class="fn">ghost_read</span>(url, api_key) <span class="kw">for</span> url <span class="kw">in</span> urls]
+    <span class="kw">return await</span> asyncio.<span class="fn">gather</span>(*tasks)
+
+results = asyncio.<span class="fn">run</span>(<span class="fn">research_multiple</span>(
+    [<span class="str">"https://openai.com"</span>, <span class="str">"https://anthropic.com"</span>],
+    <span class="str">"ghost_sk_YOUR_KEY"</span>
+))</pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- Plans -->
+    <div class="section" id="plans">
+      <div class="section-title">Plans & Limits</div>
+      <div class="section-sub">Every response includes your current usage in the <code style="color:var(--green);background:rgba(0,229,160,0.08);padding:1px 6px;border-radius:3px">_usage</code> field.</div>
+      <div class="response-box">
+<span class="rm">Plan</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="rv">Free</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="rv">Developer</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="rv">Startup</span><br>
+<span class="rm">Requests</span>&nbsp;&nbsp;&nbsp;<span class="rv">100/mo</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="rv">2,000/mo</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="rv">10,000/mo</span><br>
+<span class="rm">Price</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="rv">Free</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="rv">₹499 (~$6)</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="rv">₹1,999 (~$24)</span><br>
+<span class="rm">Key</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="rv">Instant</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="rv">On request</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="rv">On request</span>
+      </div>
+    </div>
+
+    <!-- Errors -->
+    <div class="section" id="errors">
+      <div class="section-title">Error Handling</div>
+      <div class="section-sub">Handle these common responses in your agent.</div>
+      <div class="response-box">
+<span class="rm"># 401 — Missing or invalid API key</span><br>
+{ <span class="rk">"error"</span>: <span class="rv">"API key required"</span> }<br><br>
+<span class="rm"># 429 — Rate limit exceeded</span><br>
+{ <span class="rk">"error"</span>: <span class="rv">"Rate limit exceeded"</span>, <span class="rk">"remaining"</span>: <span class="rv">0</span> }<br><br>
+<span class="rm"># 200 but site was blocked</span><br>
+{ <span class="rk">"title"</span>: <span class="rv">"Blocked"</span>, <span class="rk">"signals_data"</span>: { <span class="rk">"error"</span>: <span class="rv">"Scraper blocked"</span> } }
+      </div>
+      <div class="info-box" style="margin-top:16px">
+        <strong>Tip:</strong> Always check <code>data.title !== "Blocked"</code> and <code>data.signals_data.error</code> before using the response. Sites with enterprise Cloudflare protection may be blocked.
+      </div>
+      <br><br>
+      <div style="text-align:center;padding:32px;background:rgba(0,229,160,0.04);border:1px solid rgba(0,229,160,0.2);border-radius:12px">
+        <div style="font-size:20px;font-weight:800;color:var(--white);margin-bottom:8px">Ready to integrate?</div>
+        <div style="font-size:14px;color:var(--muted);margin-bottom:20px">Get your free API key instantly — 100 requests/month, no credit card.</div>
+        <a href="https://project-ghost-lilac.vercel.app/#contact" style="background:var(--green);color:#000;font-weight:700;font-size:14px;border-radius:8px;padding:12px 28px;text-decoration:none;display:inline-block">⚡ Get Free API Key →</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function switchTab(group, tab) {
+  // Update tab buttons
+  const tabsEl = document.getElementById(group + '-tabs') || 
+    document.querySelector(`[id="${group}"] .tabs`);
+  
+  document.querySelectorAll(`#${group}-tabs .tab, #${group} .tabs .tab`).forEach((t,i) => {
+    t.classList.remove('active');
+  });
+  event.target.classList.add('active');
+  
+  // Update content
+  document.querySelectorAll(`[id^="${group}-"]`).forEach(el => {
+    if(el.classList.contains('tab-content')) el.classList.remove('active');
+  });
+  const target = document.getElementById(`${group}-${tab}`);
+  if(target) target.classList.add('active');
+}
+
+function copyCode(btn) {
+  const pre = btn.closest('.code-block').querySelector('.tab-content.active pre') ||
+              btn.closest('.code-block').querySelector('pre');
+  if(!pre) return;
+  navigator.clipboard.writeText(pre.innerText).then(() => {
+    btn.textContent = '✓ Copied!';
+    setTimeout(() => btn.textContent = 'Copy', 2000);
+  });
+}
+</script>
+</body>
+</html>
