@@ -402,20 +402,26 @@ async function runAgent() {
   log('SYS', 'tag-sys', `Task received: "${task}"`);
   await sleep(400);
 
-  // Find URLs
+  // Find URLs — always re-evaluate based on current task
   const taskKey = task.toLowerCase();
   let urls = null;
-  for(const [k,v] of Object.entries(TASK_MAP)) {
-    if(taskKey.includes(k.split(' ')[1]) || taskKey === k) { urls = v; break; }
-  }
-  if(!urls) {
+
+  // Check exact match first
+  if(TASK_MAP[task]) {
+    urls = TASK_MAP[task];
+  } else {
+    // Keyword detection — order matters, most specific first
     if(taskKey.includes('openai')) urls = ['https://openai.com'];
     else if(taskKey.includes('stripe')) urls = ['https://stripe.com'];
+    else if(taskKey.includes('anthropic') || taskKey.includes('claude')) urls = ['https://anthropic.com'];
     else if(taskKey.includes('github')) urls = ['https://github.com/trending'];
     else if(taskKey.includes('hacker') || taskKey.includes('ycombinator')) urls = ['https://news.ycombinator.com'];
-    else if(taskKey.includes('anthropic') || taskKey.includes('claude')) urls = ['https://anthropic.com'];
     else if(taskKey.includes('apple')) urls = ['https://apple.com'];
     else if(taskKey.includes('google')) urls = ['https://about.google'];
+    else if(taskKey.includes('microsoft')) urls = ['https://microsoft.com'];
+    else if(taskKey.includes('meta') || taskKey.includes('facebook')) urls = ['https://about.meta.com'];
+    else if(taskKey.includes('tesla')) urls = ['https://tesla.com'];
+    else if(taskKey.includes('wikipedia')) urls = ['https://en.wikipedia.org/wiki/Artificial_intelligence'];
     else urls = ['https://news.ycombinator.com', 'https://github.com/trending'];
   }
 
