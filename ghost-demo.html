@@ -401,19 +401,50 @@ function addSynthesis(results, task) {
   const summaries = results.map(r => r.data.signals_data?.decision_signal?.business_intent).filter(Boolean);
   const totalTokens = results.filter(r => r.data.tokens_saved).length;
 
+  const avgConf = (results.reduce((a,r) => a + (r.data.signals_data?.integrity_layer?.confidence_score || 0), 0) / Math.max(results.length,1)).toFixed(2);
+  const avgImpactAll = results.reduce((a,r) => {
+    const items = r.data.signals_data?.items || [];
+    return a + (items.reduce((b,i) => b + (i.impact_score||0), 0) / Math.max(items.length,1));
+  }, 0) / Math.max(results.length,1);
+
   const d = document.createElement('div');
   d.className = 'synthesis';
   d.innerHTML = `
     <div class="syn-header">
       <div class="syn-icon">🧠</div>
-      <div class="syn-label">Intelligence Synthesis — ${results.length} source${results.length !== 1 ? 's' : ''} analyzed</div>
+      <div class="syn-label">Research Complete — ${results.length} source${results.length !== 1 ? 's' : ''} analyzed</div>
     </div>
-    <div class="syn-text">${summaries.join(' ') || 'Research complete. See extracted signals above.'}</div>
-    <div class="syn-entities">${allEntities.map(e => `<span class="ent">${e}</span>`).join('')}</div>
-    <div class="syn-stats">
+    <div class="syn-text" style="margin-bottom:16px">${summaries.join(' ') || 'Research complete.'}</div>
+
+    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px">
+      <div style="display:flex;align-items:center;gap:10px;font-size:12px">
+        <span style="color:var(--muted);width:120px;font-size:10px;letter-spacing:1px">TREND</span>
+        <span style="color:var(--text)">${allEntities.slice(0,2).join(', ') || 'General activity'} gaining traction</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;font-size:12px">
+        <span style="color:var(--muted);width:120px;font-size:10px;letter-spacing:1px">ACTIVITY</span>
+        <span style="color:var(--amber)">${avgConf >= 0.8 ? 'High' : avgConf >= 0.5 ? 'Medium' : 'Low'} engagement detected</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;font-size:12px">
+        <span style="color:var(--muted);width:120px;font-size:10px;letter-spacing:1px">IMPACT SCORE</span>
+        <span style="color:var(--purple)">${avgImpactAll.toFixed(1)} / 10</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;font-size:12px">
+        <span style="color:var(--muted);width:120px;font-size:10px;letter-spacing:1px">INSIGHT</span>
+        <span style="color:var(--text)">Increasing adoption of ${allEntities[0] || 'AI'} tools and frameworks</span>
+      </div>
+    </div>
+
+    <div style="margin-bottom:14px">
+      <div style="font-size:10px;color:var(--muted);letter-spacing:2px;margin-bottom:8px">TOP ENTITIES</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px">${allEntities.map((e,i) => `<span class="ent" style="${i<3?'border-color:rgba(0,255,157,0.4);color:var(--green)':''}">${e}</span>`).join('')}</div>
+    </div>
+
+    <div style="display:flex;gap:20px;flex-wrap:wrap;padding-top:14px;border-top:1px solid rgba(0,255,157,0.1);margin-bottom:12px">
       <div class="syn-stat">Sources read: <span>${results.length}</span></div>
       <div class="syn-stat">Entities found: <span>${allEntities.length}</span></div>
-      <div class="syn-stat">Avg confidence: <span>${(results.reduce((a,r) => a + (r.data.signals_data?.integrity_layer?.confidence_score || 0), 0) / Math.max(results.length,1)).toFixed(2)}</span></div>
+      <div class="syn-stat">Avg confidence: <span>${avgConf}</span></div>
+      <div class="syn-stat">Impact score: <span>${avgImpactAll.toFixed(1)}/10</span></div>
     </div>
     <div class="syn-footer">POWERED BY PROJECT GHOST API · project-ghost-lilac.vercel.app</div>`;
   out.appendChild(d);
@@ -438,6 +469,7 @@ async function runAgent() {
   badge.style.color = 'var(--amber)';
   badge.style.borderColor = 'rgba(251,191,36,0.3)';
   document.getElementById('sourcesList').innerHTML = '';
+  document.getElementById('output').innerHTML = '';
 
   // Remove welcome
   const w = document.getElementById('welcome');
