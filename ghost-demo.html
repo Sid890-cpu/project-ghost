@@ -335,6 +335,15 @@ function addResultBlock(url, data) {
   const items = sd.items || [];
   const integrity = sd.integrity_layer || {};
   const entities = [...new Set(items.flatMap(i => i.entities || []))].slice(0,8);
+  const avgImpact = items.length ? (items.reduce((a,i) => a + (i.impact_score||0), 0) / items.length).toFixed(1) : '—';
+  const confidence = integrity.confidence_score || 0;
+  const confPct = Math.round(confidence * 100);
+
+  // Generate insight tags from entities and category
+  const category = decision.category || 'General';
+  const priority = decision.priority_score || 5;
+  const activityLevel = priority >= 8 ? 'High' : priority >= 5 ? 'Medium' : 'Low';
+  const trendKeywords = entities.slice(0,2).join(', ') || 'General activity';
 
   const d = document.createElement('div');
   d.className = 'result-block success';
@@ -342,16 +351,42 @@ function addResultBlock(url, data) {
     <div class="rb-header">
       <div class="rb-icon">📄</div>
       <div class="rb-title">${data.title || url}</div>
-      <div class="rb-badge">${decision.category || 'GENERAL'} · ${decision.priority_score || '—'}/10</div>
+      <div class="rb-badge">${category}</div>
     </div>
     <div class="rb-body">
-      <div class="rb-summary">${decision.business_intent || '—'}</div>
-      <div class="rb-meta">
-        <div class="rb-stat"><span class="rb-stat-label">CONFIDENCE</span><span class="rb-stat-val">${integrity.confidence_score || '—'}</span></div>
-        <div class="rb-stat"><span class="rb-stat-label">TOKENS SAVED</span><span class="rb-stat-val">${data.tokens_saved || '—'}</span></div>
-        <div class="rb-stat"><span class="rb-stat-label">SIGNALS</span><span class="rb-stat-val">${items.length}</span></div>
+      <div class="rb-summary" style="font-size:13px;line-height:1.8;margin-bottom:16px;color:var(--text)">${decision.business_intent || '—'}</div>
+      
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+        <div style="background:rgba(0,255,157,0.04);border:1px solid rgba(0,255,157,0.15);border-radius:8px;padding:10px 12px">
+          <div style="font-size:9px;color:var(--muted);letter-spacing:2px;margin-bottom:4px">TREND</div>
+          <div style="font-size:12px;color:var(--text)">${trendKeywords} gaining traction</div>
+        </div>
+        <div style="background:rgba(79,172,254,0.04);border:1px solid rgba(79,172,254,0.15);border-radius:8px;padding:10px 12px">
+          <div style="font-size:9px;color:var(--muted);letter-spacing:2px;margin-bottom:4px">CATEGORY</div>
+          <div style="font-size:12px;color:var(--blue)">${category}</div>
+        </div>
+        <div style="background:rgba(251,191,36,0.04);border:1px solid rgba(251,191,36,0.15);border-radius:8px;padding:10px 12px">
+          <div style="font-size:9px;color:var(--muted);letter-spacing:2px;margin-bottom:4px">ACTIVITY</div>
+          <div style="font-size:12px;color:var(--amber)">${activityLevel} engagement</div>
+        </div>
+        <div style="background:rgba(167,139,250,0.04);border:1px solid rgba(167,139,250,0.15);border-radius:8px;padding:10px 12px">
+          <div style="font-size:9px;color:var(--muted);letter-spacing:2px;margin-bottom:4px">IMPACT SCORE</div>
+          <div style="font-size:12px;color:var(--purple)">${avgImpact} <span style="color:var(--muted)">/ 10</span></div>
+        </div>
       </div>
-      <div class="rb-entities">${entities.map(e => `<span class="ent">${e}</span>`).join('')}</div>
+
+      <div style="margin-bottom:12px">
+        <div style="font-size:9px;color:var(--muted);letter-spacing:2px;margin-bottom:8px">TOP ENTITIES</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px">${entities.map((e,i) => `<span class="ent" style="${i===0?'border-color:rgba(0,255,157,0.4);color:var(--green)':''}">${e}</span>`).join('')}</div>
+      </div>
+
+      <div style="display:flex;align-items:center;justify-content:space-between;padding-top:12px;border-top:1px solid var(--border)">
+        <div style="font-size:11px;color:var(--muted)">
+          <span style="color:var(--green)">${data.tokens_saved}</span> tokens saved · 
+          <span style="color:var(--green)">${confPct}%</span> confidence
+        </div>
+        <div style="font-size:10px;color:var(--muted);font-style:italic">Use case: Monitor ${category.toLowerCase()} trends</div>
+      </div>
     </div>`;
   out.appendChild(d);
   out.scrollTop = 99999;
