@@ -186,6 +186,11 @@
     .footer-links a{font-size:12px;color:var(--muted);text-decoration:none;transition:color 0.2s}
     .footer-links a:hover{color:var(--text)}
     .footer-right{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted)}
+    .mobile-menu{display:none;position:fixed;inset:0;background:rgba(2,3,5,0.98);z-index:9999;flex-direction:column;align-items:center;justify-content:center;gap:28px}
+    .mobile-menu.open{display:flex !important}
+    .mobile-menu a{font-size:20px;color:var(--text);text-decoration:none;font-weight:600}
+    .mobile-menu a:hover{color:var(--green)}
+    .mobile-menu-close{position:absolute;top:20px;right:24px;font-size:24px;color:var(--muted);cursor:pointer;background:none;border:none}
     .contact-section{background:var(--deep);border-top:1px solid var(--border)}
     /* TRY THE API */
     .try-section{background:var(--deep);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
@@ -302,11 +307,6 @@
       .nav-center{display:none}
       .btn-ghost{display:none}
       .mobile-menu-btn{display:flex !important}
-      .mobile-menu{display:none;position:fixed;inset:0;background:rgba(2,3,5,0.98);z-index:999;flex-direction:column;align-items:center;justify-content:center;gap:28px}
-      .mobile-menu.open{display:flex}
-      .mobile-menu a{font-size:20px;color:var(--text);text-decoration:none;font-weight:600}
-      .mobile-menu a:hover{color:var(--green)}
-      .mobile-menu-close{position:absolute;top:20px;right:24px;font-size:24px;color:var(--muted);cursor:pointer;background:none;border:none}
       .hero{padding:100px 16px 60px}
       .hero-eyebrow{font-size:11px;padding:5px 12px 5px 8px}
       .eyebrow-text{white-space:normal;line-height:1.4}
