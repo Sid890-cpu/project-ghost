@@ -497,8 +497,38 @@ async function runAgent() {
     else if(taskKey.includes('microsoft')) urls = ['https://microsoft.com'];
     else if(taskKey.includes('meta') || taskKey.includes('facebook')) urls = ['https://about.meta.com'];
     else if(taskKey.includes('tesla')) urls = ['https://tesla.com'];
-    else if(taskKey.includes('wikipedia')) urls = ['https://en.wikipedia.org/wiki/Artificial_intelligence'];
-    else urls = ['https://news.ycombinator.com', 'https://github.com/trending'];
+    else if(taskKey.includes('crypto') || taskKey.includes('bitcoin') || taskKey.includes('ethereum')) urls = ['https://coindesk.com', 'https://cointelegraph.com'];
+    else if(taskKey.includes('ai') || taskKey.includes('artificial intelligence')) urls = ['https://news.ycombinator.com', 'https://openai.com'];
+    else if(taskKey.includes('market') || taskKey.includes('stock') || taskKey.includes('finance')) urls = ['https://news.ycombinator.com'];
+    else {
+      // For unknown topics — show honest message instead of wrong results
+      urls = null;
+    }
+  }
+
+  // Handle unknown topics gracefully
+  if(!urls) {
+    log('SYS', 'tag-sys', `Task received: "${task}"`);
+    await sleep(300);
+    const errEl = document.createElement('div');
+    errEl.className = 'synthesis';
+    errEl.innerHTML = `
+      <div class="syn-header"><div class="syn-icon">⚠️</div><div class="syn-label">Topic not supported yet</div></div>
+      <div class="syn-text" style="margin-bottom:16px">Ghost works best with company research, tech news, and developer topics. For "${task}", try being more specific like:<br><br>
+      <span style="color:var(--green)">→ "Research OpenAI latest news"</span><br>
+      <span style="color:var(--green)">→ "What is trending on GitHub today?"</span><br>
+      <span style="color:var(--green)">→ "Research Anthropic and Claude"</span><br>
+      <span style="color:var(--green)">→ "What products does Stripe offer?"</span>
+      </div>
+      <div class="syn-footer">More sources coming soon · project-ghost-lilac.vercel.app</div>`;
+    document.getElementById('output').appendChild(errEl);
+    btn.disabled = false;
+    document.getElementById('runIcon').textContent = '▶';
+    document.getElementById('runText').textContent = 'EXECUTE';
+    badge.textContent = 'READY';
+    badge.style.color = 'var(--green)';
+    badge.style.borderColor = 'rgba(0,255,157,0.2)';
+    return;
   }
 
   const think1 = addThinking(`Planning research strategy for: "${task}"`);
