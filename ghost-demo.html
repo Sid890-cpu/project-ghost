@@ -478,15 +478,23 @@ async function runAgent() {
   log('SYS', 'tag-sys', `Task received: "${task}"`);
   await sleep(400);
 
-  // Find URLs — always re-evaluate based on current task
+  // Smart URL detection
   const taskKey = task.toLowerCase();
   let urls = null;
 
-  // Check exact match first
-  if(TASK_MAP[task]) {
+  // Check if user typed a direct URL
+  const isURL = task.startsWith('http') || task.startsWith('www.') || 
+                (/^[a-zA-Z0-9-]+\.[a-zA-Z]{2,}/.test(task) && !task.includes(' '));
+  
+  if(isURL) {
+    // Direct URL — prepend https if needed
+    const cleanURL = task.startsWith('http') ? task : 'https://' + task;
+    urls = [cleanURL];
+    log('SYS', 'tag-sys', `Direct URL detected: ${cleanURL}`);
+  } else if(TASK_MAP[task]) {
     urls = TASK_MAP[task];
   } else {
-    // Keyword detection — order matters, most specific first
+    // Keyword detection
     if(taskKey.includes('openai')) urls = ['https://openai.com'];
     else if(taskKey.includes('stripe')) urls = ['https://stripe.com'];
     else if(taskKey.includes('anthropic') || taskKey.includes('claude')) urls = ['https://anthropic.com'];
@@ -497,38 +505,39 @@ async function runAgent() {
     else if(taskKey.includes('microsoft')) urls = ['https://microsoft.com'];
     else if(taskKey.includes('meta') || taskKey.includes('facebook')) urls = ['https://about.meta.com'];
     else if(taskKey.includes('tesla')) urls = ['https://tesla.com'];
+    else if(taskKey.includes('nvidia')) urls = ['https://nvidia.com'];
+    else if(taskKey.includes('amazon') || taskKey.includes('aws')) urls = ['https://aws.amazon.com'];
     else if(taskKey.includes('crypto') || taskKey.includes('bitcoin') || taskKey.includes('ethereum')) urls = ['https://coindesk.com', 'https://cointelegraph.com'];
-    else if(taskKey.includes('ai') || taskKey.includes('artificial intelligence')) urls = ['https://news.ycombinator.com', 'https://openai.com'];
-    else if(taskKey.includes('market') || taskKey.includes('stock') || taskKey.includes('finance')) urls = ['https://news.ycombinator.com'];
-    else {
-      // For unknown topics — show honest message instead of wrong results
-      urls = null;
+    else if(taskKey.includes('ai') || taskKey.includes('artificial intelligence') || taskKey.includes('llm') || taskKey.includes('agent')) urls = ['https://news.ycombinator.com', 'https://openai.com'];
+    else if(taskKey.includes('market') || taskKey.includes('stock') || taskKey.includes('finance') || taskKey.includes('invest')) urls = ['https://news.ycombinator.com'];
+    else if(taskKey.includes('news') || taskKey.includes('trend') || taskKey.includes('latest') || taskKey.includes('tool') || taskKey.includes('developer') || taskKey.includes('startup') || taskKey.includes('product')) {
+      urls = ['https://news.ycombinator.com', 'https://github.com/trending'];
     }
-  }
-
-  // Handle unknown topics gracefully
-  if(!urls) {
-    log('SYS', 'tag-sys', `Task received: "${task}"`);
-    await sleep(300);
-    const errEl = document.createElement('div');
-    errEl.className = 'synthesis';
-    errEl.innerHTML = `
-      <div class="syn-header"><div class="syn-icon">⚠️</div><div class="syn-label">Topic not supported yet</div></div>
-      <div class="syn-text" style="margin-bottom:16px">Ghost works best with company research, tech news, and developer topics. For "${task}", try being more specific like:<br><br>
-      <span style="color:var(--green)">→ "Research OpenAI latest news"</span><br>
-      <span style="color:var(--green)">→ "What is trending on GitHub today?"</span><br>
-      <span style="color:var(--green)">→ "Research Anthropic and Claude"</span><br>
-      <span style="color:var(--green)">→ "What products does Stripe offer?"</span>
-      </div>
-      <div class="syn-footer">More sources coming soon · project-ghost-lilac.vercel.app</div>`;
-    document.getElementById('output').appendChild(errEl);
-    btn.disabled = false;
-    document.getElementById('runIcon').textContent = '▶';
-    document.getElementById('runText').textContent = 'EXECUTE';
-    badge.textContent = 'READY';
-    badge.style.color = 'var(--green)';
-    badge.style.borderColor = 'rgba(0,255,157,0.2)';
-    return;
+    else {
+      // Unknown query — show helpful message explaining Ghost reads URLs
+      const errEl = document.createElement('div');
+      errEl.className = 'synthesis';
+      errEl.innerHTML = `
+        <div class="syn-header"><div class="syn-icon">💡</div><div class="syn-label">Tip — Ghost reads URLs, not search queries</div></div>
+        <div class="syn-text" style="margin-bottom:16px">
+          Ghost is a web reader for AI agents — it reads specific websites and structures their content.<br><br>
+          <strong style="color:var(--green)">Try typing a URL directly:</strong><br>
+          <span style="color:var(--green)">→ bbc.com/news</span><br>
+          <span style="color:var(--green)">→ reuters.com</span><br>
+          <span style="color:var(--green)">→ en.wikipedia.org/wiki/Iran</span><br>
+          <span style="color:var(--green)">→ any public website URL</span><br><br>
+          <strong style="color:var(--green)">Or try a preset mission above ↑</strong>
+        </div>
+        <div class="syn-footer">Ghost reads any public URL · project-ghost-lilac.vercel.app</div>`;
+      document.getElementById('output').appendChild(errEl);
+      btn.disabled = false;
+      document.getElementById('runIcon').textContent = '▶';
+      document.getElementById('runText').textContent = 'EXECUTE';
+      badge.textContent = 'READY';
+      badge.style.color = 'var(--green)';
+      badge.style.borderColor = 'rgba(0,255,157,0.2)';
+      return;
+    }
   }
 
   const think1 = addThinking(`Planning research strategy for: "${task}"`);
