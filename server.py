@@ -375,7 +375,7 @@ if __name__ == "__main__":
             "name": "Project Ghost",
             "description": "Web reading layer for AI agents. Convert any public URL into structured, agent-ready data — entities, signals, summary — in one tool call.",
             "version": "2.0.0",
-            "url": "https://project-ghost-production.up.railway.app/mcp",
+            "url": "https://project-ghost-rkwm.onrender.com/mcp",
             "homepage": "https://project-ghost-lilac.vercel.app",
             "tools": [
                 {
@@ -527,7 +527,7 @@ body{background:#0a0e1a;color:#e2e8f0;font-family:'Segoe UI',system-ui,sans-seri
       <p>The web reading layer for AI agents. Convert any public URL into structured, agent-ready data — entities, signals, summaries — in a single API call.</p>
       <div class="base-url">
         <span class="base-url-label">BASE URL</span>
-        https://project-ghost-production.up.railway.app
+        https://project-ghost-rkwm.onrender.com
       </div>
     </div>
 
@@ -543,7 +543,7 @@ body{background:#0a0e1a;color:#e2e8f0;font-family:'Segoe UI',system-ui,sans-seri
     <div class="code-block">
       <div class="code-tabs"><div class="code-tab active">cURL</div><div class="code-tab">Python</div><div class="code-tab">JavaScript</div></div>
       <div class="code-content"><span class="comment"># Extract structured data from any URL</span>
-curl -X POST https://project-ghost-production.up.railway.app/distill \
+curl -X POST https://project-ghost-rkwm.onrender.com/distill \
   -H <span class="str">"Content-Type: application/json"</span> \
   -d <span class="str">'{"url": "https://apple.com"}'</span></div>
     </div>
@@ -681,7 +681,7 @@ curl -X POST https://project-ghost-production.up.railway.app/distill \
           <div class="code-block"><div class="code-content">{
   <span class="key">"mcpServers"</span>: {
     <span class="key">"project-ghost"</span>: {
-      <span class="key">"url"</span>: <span class="str">"https://project-ghost-production.up.railway.app/mcp"</span>,
+      <span class="key">"url"</span>: <span class="str">"https://project-ghost-rkwm.onrender.com/mcp"</span>,
       <span class="key">"transport"</span>: <span class="str">"http"</span>
     }
   }

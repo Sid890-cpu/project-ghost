@@ -408,7 +408,7 @@
     <a href="/integrate.html" target="_blank">Integrate</a>
   </div>
   <div class="nav-right">
-    <a href="https://project-ghost-production.up.railway.app" target="_blank" class="btn-ghost">Docs</a>
+    <a href="https://project-ghost-rkwm.onrender.com" target="_blank" class="btn-ghost">Docs</a>
     <a href="/ghost-demo.html" target="_blank" class="btn-solid" onclick="trackEvent('live_demo_click', {})">Live Demo →</a>
     <button class="mobile-menu-btn" onclick="toggleMobileMenu()" style="display:none;background:none;border:none;color:var(--text);font-size:22px;cursor:pointer;padding:4px;margin-left:8px">☰</button>
   </div>
@@ -424,7 +424,7 @@
   <a href="/ghost-demo.html" target="_blank" style="color:var(--green)">▶ Agent Demo</a>
   <a href="/integrate.html" target="_blank">Integration Guide</a>
   <a href="#contact" onclick="toggleMobileMenu()">Get API Key</a>
-  <a href="https://project-ghost-production.up.railway.app" target="_blank">Docs ↗</a>
+  <a href="https://project-ghost-rkwm.onrender.com" target="_blank">Docs ↗</a>
 </div>
 
 <section class="hero">
@@ -436,7 +436,7 @@
   <p class="hero-sub">AI agents can think. They can plan. But they can't read messy websites. <strong>Project Ghost</strong> converts any public URL into clean, structured data your agent can actually use — in one API call.</p>
   <div class="hero-cta">
     <a href="#demo" class="btn-hp"><span>▶</span> See It Work</a>
-    <a href="https://project-ghost-production.up.railway.app" target="_blank" class="btn-hs">Developer Docs <span>↗</span></a>
+    <a href="https://project-ghost-rkwm.onrender.com" target="_blank" class="btn-hs">Developer Docs <span>↗</span></a>
     <a href="#contact" class="btn-hs">Contact</a>
     <a href="#architecture" class="btn-hs">Architecture</a>
   </div>
@@ -537,7 +537,7 @@
           <div class="code-hdr"><span class="code-ttl">curl — POST /distill</span><div class="cdots"><div class="cdot" style="background:#ff5f57"></div><div class="cdot" style="background:#ffbd2e"></div><div class="cdot" style="background:#28c840"></div></div></div>
           <div class="code-bdy"><pre><span class="tc"># Distill any URL into structured signals</span>
 
-<span class="tk">curl</span> https://project-ghost-production.up.railway.app/distill \
+<span class="tk">curl</span> https://project-ghost-rkwm.onrender.com/distill \
   -X POST \
   -H <span class="ts">"Content-Type: application/json"</span> \
   -H <span class="ts">"Authorization: Bearer API_KEY"</span> \
@@ -740,10 +740,10 @@ GET /search?<span class="tp">q</span>=<span class="ts">nvidia</span>&amp;<span c
     <h2 class="cta-title reveal">The web is your agent's<br><em>superpower.</em></h2>
     <p class="cta-sub reveal">Give your AI agent the ability to read any website, extract any data, and act on real information — not hallucinations. Live API. No waitlist.</p>
     <div class="cta-btns reveal">
-      <a href="https://project-ghost-production.up.railway.app" target="_blank" class="btn-hp">Start Building →</a>
+      <a href="https://project-ghost-rkwm.onrender.com" target="_blank" class="btn-hp">Start Building →</a>
       <a href="#use-cases" class="btn-hs">See Use Cases ↗</a>
     </div>
-    <div class="cta-note reveal">Base URL: <a href="https://project-ghost-production.up.railway.app">project-ghost-production.up.railway.app</a></div>
+    <div class="cta-note reveal">Base URL: <a href="https://project-ghost-rkwm.onrender.com">project-ghost-rkwm.onrender.com</a></div>
   </div>
 </section>
 
@@ -822,7 +822,7 @@ GET /search?<span class="tp">q</span>=<span class="ts">nvidia</span>&amp;<span c
     <a href="#contact">Contact</a>
     <a href="/ghost-demo.html" target="_blank">Agent Demo ↗</a>
     <a href="/integrate.html" target="_blank">Integration Guide ↗</a>
-    <a href="https://project-ghost-production.up.railway.app" target="_blank">Docs ↗</a>
+    <a href="https://project-ghost-rkwm.onrender.com" target="_blank">Docs ↗</a>
     <a href="https://github.com/Sid890-cpu/project-ghost" target="_blank">GitHub ↗</a>
   </div>
   <div class="footer-right">Web Intelligence Infrastructure for AI Agents</div>
@@ -863,7 +863,7 @@ GET /search?<span class="tp">q</span>=<span class="ts">nvidia</span>&amp;<span c
 
     const t0 = Date.now();
     try {
-      const res = await fetch('https://project-ghost-production.up.railway.app/distill', {
+      const res = await fetch('https://project-ghost-rkwm.onrender.com/distill', {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -1093,7 +1093,7 @@ GET /search?<span class="tp">q</span>=<span class="ts">nvidia</span>&amp;<span c
     status.className = 'cf-status';
 
     try {
-      const res = await fetch('https://project-ghost-production.up.railway.app/generate-key', {
+      const res = await fetch('https://project-ghost-rkwm.onrender.com/generate-key', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -1112,7 +1112,7 @@ GET /search?<span class="tp">q</span>=<span class="ts">nvidia</span>&amp;<span c
         `<span style="color:#5a6480"># Add Bearer prefix before your key in every request</span><br>` +
         `<span style="color:#60a5fa">Authorization: Bearer ${data.key}</span><br><br>` +
         `<span style="color:#5a6480"># cURL</span><br>` +
-        `curl -X POST https://project-ghost-production.up.railway.app/distill \<br>` +
+        `curl -X POST https://project-ghost-rkwm.onrender.com/distill \<br>` +
         `&nbsp;&nbsp;-H <span style="color:#f59e0b">"Authorization: Bearer ${data.key}"</span> \<br>` +
         `&nbsp;&nbsp;-H "Content-Type: application/json" \<br>` +
         `&nbsp;&nbsp;-d '{"url": "https://apple.com"}'<br><br>` +
