@@ -60,11 +60,11 @@ print(data["tokens_saved"])
 
 | Method | Endpoint | Description | Auth |
 |--------|----------|-------------|------|
-| `GET` | `/health` | Liveness check | No |
-| `POST` | `/distill` | Any URL to structured intelligence | Yes |
-| `GET` | `/feed` | Poll cached signals | Yes |
-| `GET` | `/search?q=nvidia` | Search by entity name | Yes |
-| `MCP` | `/mcp` | Native MCP agent integration | Yes |
+| `GET` | `/health` | Liveness check | ❌ |
+| `POST` | `/distill` | Any URL to structured intelligence | ✅ |
+| `GET` | `/feed` | Poll cached signals | ✅ |
+| `GET` | `/search?q=nvidia` | Search by entity name | ✅ |
+| `MCP` | `/mcp` | Native MCP agent integration | ✅ |
 
 ### Authentication
 
